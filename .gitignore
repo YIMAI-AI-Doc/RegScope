@@ -1,0 +1,15 @@
+node_modules
+.next
+dist
+coverage
+playwright-report
+test-results
+*.log
+.env
+.env.local
+.env.*.local
+.DS_Store
+*.tsbuildinfo
+.superpowers
+.trae
+node_modules.partial

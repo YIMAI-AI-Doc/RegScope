@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --bg: #f4f7fb;
+  --panel: rgba(255, 255, 255, 0.78);
+  --panel-strong: #ffffff;
+  --text: #0f1727;
+  --muted: #55657f;
+  --border: rgba(104, 132, 171, 0.18);
+  --accent: #21497a;
+}
+
+html {
+  background:
+    radial-gradient(circle at top left, rgba(112, 154, 212, 0.18), transparent 28%),
+    radial-gradient(circle at top right, rgba(178, 197, 227, 0.28), transparent 24%),
+    linear-gradient(180deg, #f8fbff 0%, #f1f5fb 100%);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  font-family:
+    "PingFang SC",
+    "Hiragino Sans GB",
+    "Microsoft YaHei",
+    "Noto Sans CJK SC",
+    system-ui,
+    sans-serif;
+  background-image:
+    linear-gradient(rgba(103, 129, 164, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(103, 129, 164, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 32px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1f4f86, #2f6aa8);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 12px 28px rgba(31, 79, 134, 0.24);
+}
+
+.brand-name {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.brand-tag {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.topnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.topnav a {
+  position: relative;
+  padding: 4px 0;
+}
+
+.topnav a:hover {
+  color: var(--text);
+}
+
+.app-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px 20px;
+  }
+
+  .app-main {
+    padding: 20px;
+  }
+}
