@@ -1,0 +1,198 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ContentType {
+  ARTICLE
+  POLICY
+  NEWS
+  GUIDANCE
+  ALERT
+}
+
+enum FollowTargetType {
+  COUNTRY
+  SOURCE
+  TOPIC
+}
+
+enum FeedFormat {
+  AUTO
+  RSS
+  ATOM
+  JSON
+}
+
+enum DiscussionStatus {
+  OPEN
+  IN_REVIEW
+  PROVISIONAL_CONCLUSION
+  CONTROVERSIAL
+  CLOSED
+}
+
+enum EvidenceLabel {
+  OFFICIAL
+  ANALYSIS
+  EXPERIENCE
+  UNVERIFIED
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String?
+  role         String        @default("USER")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  follows      Follow[]
+  discussions  Discussion[]
+  answers      Answer[]
+  conclusions  DiscussionConclusion[] @relation("ConclusionEditedBy")
+}
+
+model Country {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  region      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  sources     Source[]
+  contents    ContentItem[]
+  follows     Follow[]
+  discussions Discussion[]
+}
+
+model Source {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  description String?
+  websiteUrl  String?
+  feedUrl     String?
+  feedFormat  FeedFormat @default(AUTO)
+  countryId   String?
+  country     Country?  @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  isOfficial  Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  contents    ContentItem[]
+  follows     Follow[]
+}
+
+model Topic {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  parentId    String?
+  parent      Topic?    @relation("TopicTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Topic[]   @relation("TopicTree")
+  level       Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  contents    ContentItem[]
+  discussions Discussion[]
+  follows     Follow[]
+}
+
+model ContentItem {
+  id             String      @id @default(cuid())
+  slug           String      @unique
+  title          String
+  summary        String
+  body           String?
+  canonicalUrl   String      @unique
+  contentType    ContentType
+  publishedAt    DateTime
+  sourceId       String
+  source         Source      @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  countryId      String?
+  country        Country?    @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  primaryTopicId String?
+  primaryTopic   Topic?      @relation(fields: [primaryTopicId], references: [id], onDelete: SetNull)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model Follow {
+  id             String           @id @default(cuid())
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetType     FollowTargetType
+  countryId      String?
+  country        Country?         @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  sourceId       String?
+  source         Source?          @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  topicId        String?
+  topic          Topic?           @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  createdAt      DateTime         @default(now())
+
+  @@index([userId, targetType])
+  @@unique([userId, targetType, countryId, sourceId, topicId])
+}
+
+model Discussion {
+  id           String                 @id @default(cuid())
+  slug         String                 @unique
+  title        String
+  summary      String
+  status       DiscussionStatus       @default(OPEN)
+  countryId    String?
+  country      Country?               @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  topicId      String?
+  topic        Topic?                 @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  createdById  String
+  createdBy    User                   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+  conclusion   DiscussionConclusion?
+  evidence     DiscussionEvidence[]
+  answers      Answer[]
+}
+
+model DiscussionConclusion {
+  id            String     @id @default(cuid())
+  discussionId  String     @unique
+  discussion    Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  summary       String
+  evidenceNote  String?
+  updatedById   String?
+  updatedBy     User?      @relation("ConclusionEditedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  updatedAt     DateTime   @updatedAt
+  createdAt     DateTime   @default(now())
+}
+
+model DiscussionEvidence {
+  id            String           @id @default(cuid())
+  discussionId  String
+  discussion    Discussion       @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  title         String
+  url           String?
+  sourceLabel   EvidenceLabel
+  note          String?
+  createdAt     DateTime         @default(now())
+
+  @@unique([discussionId, title])
+}
+
+model Answer {
+  id            String           @id @default(cuid())
+  discussionId  String
+  discussion    Discussion       @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  authorId      String
+  author        User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body          String
+  evidenceLabel EvidenceLabel     @default(UNVERIFIED)
+  isAccepted    Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@unique([discussionId, authorId, body])
+}
