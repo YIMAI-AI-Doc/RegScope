@@ -1,0 +1,11 @@
+import { runAllFeeds } from "../src/workers/ingest/run-all-feeds";
+
+async function main() {
+  const report = await runAllFeeds();
+  console.log(JSON.stringify(report, null, 2));
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
