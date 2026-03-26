@@ -68,6 +68,80 @@ export type FeedPageData = {
   };
 };
 
+export type CatalogCardData = SmallCardData & {
+  summary: string;
+};
+
+export type TopicDirectoryData = {
+  title: string;
+  summary: string;
+  cards: CatalogCardData[];
+  latestContent: IntelligenceCardData[];
+  relatedDiscussions: DiscussionDigestData[];
+};
+
+export type SourceDirectoryData = {
+  title: string;
+  summary: string;
+  cards: CatalogCardData[];
+  latestContent: IntelligenceCardData[];
+  relatedDiscussions: DiscussionDigestData[];
+};
+
+export type CountryDirectoryData = {
+  title: string;
+  summary: string;
+  cards: CatalogCardData[];
+  latestContent: IntelligenceCardData[];
+  relatedDiscussions: DiscussionDigestData[];
+};
+
+export type ContentDetailData = {
+  slug: string;
+  title: string;
+  summary: string;
+  body: string;
+  canonicalUrl: string;
+  contentTypeLabel: string;
+  publishedAtLabel: string;
+  sourceName: string;
+  sourceHref: string;
+  countryName: string;
+  countryHref: string;
+  topicName: string;
+  topicHref: string;
+  accent: IntelligenceCardData["accent"];
+};
+
+export type TopicPageData = {
+  topic: CatalogCardData;
+  subtopics: CatalogCardData[];
+  latestContent: IntelligenceCardData[];
+  relatedSources: CatalogCardData[];
+  relatedDiscussions: DiscussionDigestData[];
+};
+
+export type SourcePageData = {
+  source: CatalogCardData;
+  latestContent: IntelligenceCardData[];
+  relatedTopics: CatalogCardData[];
+  relatedDiscussions: DiscussionDigestData[];
+};
+
+export type CountryPageData = {
+  country: CatalogCardData;
+  latestContent: IntelligenceCardData[];
+  relatedSources: CatalogCardData[];
+  relatedTopics: CatalogCardData[];
+  relatedDiscussions: DiscussionDigestData[];
+};
+
+export type ContentPageData = {
+  content: ContentDetailData;
+  relatedContent: IntelligenceCardData[];
+  relatedDiscussions: DiscussionDigestData[];
+};
+
 type DbContentItem = Awaited<ReturnType<typeof loadContentItems>>[number];
 
 const demoHomepage: HomepageData = {
@@ -207,7 +281,7 @@ const demoHomepage: HomepageData = {
   discussions: [
     {
       slug: "ai-guidance-impact",
-      href: "/discussions/ai-guidance-impact",
+      href: "/feed?query=AI%20%E6%8C%87%E5%8D%97%E5%AF%B9%E7%8E%B0%E6%9C%89%E7%94%B3%E6%8A%A5%E8%B7%AF%E5%BE%84%E7%9A%84%E5%BD%B1%E5%93%8D%E6%98%AF%E4%BB%80%E4%B9%88",
       title: "AI 指南对现有申报路径的影响是什么？",
       summary: "需要优先判断它是立即改变流程，还是主要强化数据治理。",
       status: "已形成阶段性结论",
@@ -218,7 +292,7 @@ const demoHomepage: HomepageData = {
     },
     {
       slug: "cmc-change-control",
-      href: "/discussions/cmc-change-control",
+      href: "/feed?query=CMC%20%E5%8F%98%E6%9B%B4%E6%8E%A7%E5%88%B6%E6%80%8E%E6%A0%B7%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E9%9C%80%E8%A6%81%E8%A1%A5%E5%85%85%E7%A8%B3%E5%AE%9A%E6%80%A7%E6%95%B0%E6%8D%AE",
       title: "CMC 变更控制怎样判断是否需要补充稳定性数据？",
       summary: "不同地区对同类变更的证据要求不完全一致。",
       status: "讨论中",
@@ -276,8 +350,7 @@ export async function getHomepageData(): Promise<HomepageData> {
 
 export async function getFeedPageData(filters: FeedFilters = {}): Promise<FeedPageData> {
   try {
-    const contentItems = await loadContentItems();
-    const filtered = filterContentItems(contentItems, filters);
+    const filtered = await loadFilteredContentItems(filters);
 
     return {
       items: filtered.map(mapContentToCard),
@@ -292,6 +365,155 @@ export async function getFeedPageData(filters: FeedFilters = {}): Promise<FeedPa
       filters: demoFeedFilters,
     };
   }
+}
+
+export async function getTopicDirectoryData(): Promise<TopicDirectoryData> {
+  try {
+    const [contentItems, discussions] = await Promise.all([
+      loadFilteredContentItems(),
+      loadDiscussionDigestsWithFallback(),
+    ]);
+
+    return {
+      title: "领域订阅",
+      summary: "按大领域和小领域订阅全球医药监管动态。",
+      cards: topicCatalog,
+      latestContent: contentItems.slice(0, 4).map(mapContentToCard),
+      relatedDiscussions: discussions.slice(0, 3),
+    };
+  } catch {
+    return {
+      title: "领域订阅",
+      summary: "按大领域和小领域订阅全球医药监管动态。",
+      cards: topicCatalog,
+      latestContent: demoContentItems.slice(0, 4).map(mapContentToCard),
+      relatedDiscussions: demoHomepage.discussions,
+    };
+  }
+}
+
+export async function getSourceDirectoryData(): Promise<SourceDirectoryData> {
+  try {
+    const [contentItems, discussions] = await Promise.all([
+      loadFilteredContentItems(),
+      loadDiscussionDigestsWithFallback(),
+    ]);
+
+    return {
+      title: "官方来源",
+      summary: "聚合全球主要官方监管机构，进入来源页后查看最新发布。",
+      cards: sourceCatalog,
+      latestContent: contentItems.slice(0, 4).map(mapContentToCard),
+      relatedDiscussions: discussions.slice(0, 3),
+    };
+  } catch {
+    return {
+      title: "官方来源",
+      summary: "聚合全球主要官方监管机构，进入来源页后查看最新发布。",
+      cards: sourceCatalog,
+      latestContent: demoContentItems.slice(0, 4).map(mapContentToCard),
+      relatedDiscussions: demoHomepage.discussions,
+    };
+  }
+}
+
+export async function getCountryDirectoryData(): Promise<CountryDirectoryData> {
+  try {
+    const [contentItems, discussions] = await Promise.all([
+      loadFilteredContentItems(),
+      loadDiscussionDigestsWithFallback(),
+    ]);
+
+    return {
+      title: "国家地区",
+      summary: "从监管辖区视角观察全球医药政策变化。",
+      cards: countryCatalog,
+      latestContent: contentItems.slice(0, 4).map(mapContentToCard),
+      relatedDiscussions: discussions.slice(0, 3),
+    };
+  } catch {
+    return {
+      title: "国家地区",
+      summary: "从监管辖区视角观察全球医药政策变化。",
+      cards: countryCatalog,
+      latestContent: demoContentItems.slice(0, 4).map(mapContentToCard),
+      relatedDiscussions: demoHomepage.discussions,
+    };
+  }
+}
+
+export async function getTopicPageData(slug: string): Promise<TopicPageData> {
+  const topic = findCatalogItem(topicCatalog, slug, "领域", "/topics");
+  const contentItems = await loadFilteredContentItems({ topic: slug });
+  const discussions = await loadDiscussionDigestsWithFallback();
+  const relatedSources = buildSourcesFromContentItems(contentItems);
+  const subtopics = buildTopicSubtopics(slug);
+  const relatedDiscussions = filterDiscussionsByKeyword(discussions, topic.label);
+
+  return {
+    topic,
+    subtopics,
+    latestContent: contentItems.slice(0, 4).map(mapContentToCard),
+    relatedSources,
+    relatedDiscussions: (relatedDiscussions.length > 0 ? relatedDiscussions : discussions).slice(0, 3),
+  };
+}
+
+export async function getSourcePageData(slug: string): Promise<SourcePageData> {
+  const source = findCatalogItem(sourceCatalog, slug, "来源", "/sources");
+  const contentItems = await loadFilteredContentItems({ source: slug });
+  const discussions = await loadDiscussionDigestsWithFallback();
+  const relatedTopics = buildTopicsFromContentItems(contentItems);
+  const relatedDiscussions = filterDiscussionsByKeyword(discussions, source.label);
+
+  return {
+    source,
+    latestContent: contentItems.slice(0, 4).map(mapContentToCard),
+    relatedTopics,
+    relatedDiscussions: (relatedDiscussions.length > 0 ? relatedDiscussions : discussions).slice(0, 3),
+  };
+}
+
+export async function getCountryPageData(slug: string): Promise<CountryPageData> {
+  const country = findCatalogItem(countryCatalog, slug, "国家", "/countries");
+  const contentItems = await loadFilteredContentItems({ country: slug });
+  const discussions = await loadDiscussionDigestsWithFallback();
+  const relatedSources = buildSourcesFromContentItems(contentItems);
+  const relatedTopics = buildTopicsFromContentItems(contentItems);
+  const relatedDiscussions = filterDiscussionsByKeyword(discussions, country.label);
+
+  return {
+    country,
+    latestContent: contentItems.slice(0, 4).map(mapContentToCard),
+    relatedSources,
+    relatedTopics,
+    relatedDiscussions: (relatedDiscussions.length > 0 ? relatedDiscussions : discussions).slice(0, 3),
+  };
+}
+
+export async function getContentPageData(slug: string): Promise<ContentPageData> {
+  const contentItem = await loadContentItemBySlug(slug);
+  const current = contentItem ?? demoContentItems[0];
+  const relatedContent = (await loadFilteredContentItems())
+    .filter((item) => item.slug !== current.slug)
+    .filter((item) =>
+      item.sourceId === current.sourceId ||
+      item.countryId === current.countryId ||
+      item.primaryTopicId === current.primaryTopicId,
+    )
+    .slice(0, 3)
+    .map(mapContentToCard);
+  const discussions = await loadDiscussionDigestsWithFallback();
+  const relatedDiscussions = filterDiscussionsByKeyword(
+    discussions,
+    current.primaryTopic?.name ?? current.title,
+  );
+
+  return {
+    content: mapContentToDetail(current),
+    relatedContent,
+    relatedDiscussions: (relatedDiscussions.length > 0 ? relatedDiscussions : discussions).slice(0, 3),
+  };
 }
 
 const demoFeedFilters = {
@@ -326,6 +548,143 @@ const demoFeedFilters = {
     { slug: "30d", href: "/feed?timeRange=30d", label: "30 天", note: "本月", badge: "30d" },
   ],
 };
+
+const topicCatalog: CatalogCardData[] = [
+  {
+    slug: "clinical-trials",
+    href: "/topics/clinical-trials",
+    label: "临床试验",
+    note: "方案设计 / 去中心化 / RWE",
+    badge: "12",
+    summary: "围绕临床试验设计、执行和数据证据的全球监管变化。",
+  },
+  {
+    slug: "cmc-and-manufacturing",
+    href: "/topics/cmc-and-manufacturing",
+    label: "CMC 与生产",
+    note: "工艺 / 杂质 / 稳定性",
+    badge: "8",
+    summary: "聚焦工艺变更、稳定性、杂质控制和生产质量要求。",
+  },
+  {
+    slug: "registration-submission",
+    href: "/topics/registration-submission",
+    label: "注册申报",
+    note: "eCTD / 路径 / 资料提交",
+    badge: "10",
+    summary: "覆盖申报路径、递交流程与资料格式变化。",
+  },
+  {
+    slug: "labeling-and-insert",
+    href: "/topics/labeling-and-insert",
+    label: "标签与说明书",
+    note: "适应症 / 风险提示 / 说明书",
+    badge: "6",
+    summary: "关注标签、说明书、适应症和风险提示的法规变化。",
+  },
+  {
+    slug: "post-marketing",
+    href: "/topics/post-marketing",
+    label: "上市后管理",
+    note: "变更 / 再评价 / 风险管理",
+    badge: "7",
+    summary: "跟踪上市后变更、再评价和风险管理要求。",
+  },
+  {
+    slug: "pharmacovigilance",
+    href: "/topics/pharmacovigilance",
+    label: "药物警戒",
+    note: "安全性 / 信号 / 报告",
+    badge: "6",
+    summary: "聚焦安全性监测、信号识别和报告规则。",
+  },
+  {
+    slug: "digital-ai-regulation",
+    href: "/topics/digital-ai-regulation",
+    label: "数字化与 AI 监管",
+    note: "算法 / 数据治理 / 数字工具",
+    badge: "9",
+    summary: "覆盖 AI 辅助审评、数据治理和数字化工具监管。",
+  },
+  {
+    slug: "international-guidance",
+    href: "/topics/international-guidance",
+    label: "国际协调与指南",
+    note: "ICH / FDA / EMA / MHRA",
+    badge: "5",
+    summary: "聚焦国际监管协调、共识指南和跨区域对齐。",
+  },
+];
+
+const sourceCatalog: CatalogCardData[] = [
+  {
+    slug: "fda",
+    href: "/sources/fda",
+    label: "美国 FDA",
+    note: "官方监管机构",
+    badge: "RSS",
+    summary: "美国食品药品监督管理局的官方通知、指南与更新。",
+  },
+  {
+    slug: "ema",
+    href: "/sources/ema",
+    label: "欧盟 EMA",
+    note: "官方监管机构",
+    badge: "RSS",
+    summary: "欧洲药品管理局的指南、公告和协调信息。",
+  },
+  {
+    slug: "nmpa",
+    href: "/sources/nmpa",
+    label: "中国 NMPA",
+    note: "官方监管机构",
+    badge: "官方",
+    summary: "国家药监局发布的政策、征求意见和监管动态。",
+  },
+  {
+    slug: "mhra",
+    href: "/sources/mhra",
+    label: "英国 MHRA",
+    note: "官方监管机构",
+    badge: "RSS",
+    summary: "英国药品和健康产品管理局的监管更新。",
+  },
+];
+
+const countryCatalog: CatalogCardData[] = [
+  {
+    slug: "us",
+    href: "/countries/us",
+    label: "美国",
+    note: "FDA 追踪",
+    badge: "北美",
+    summary: "美国监管动态、指南草案和审评趋势的入口。",
+  },
+  {
+    slug: "eu",
+    href: "/countries/eu",
+    label: "欧盟",
+    note: "EMA 追踪",
+    badge: "欧洲",
+    summary: "欧盟范围内的监管协调、指南和成员国动态。",
+  },
+  {
+    slug: "cn",
+    href: "/countries/cn",
+    label: "中国",
+    note: "NMPA 追踪",
+    badge: "亚太",
+    summary: "中国境内政策、指南和征求意见的聚合入口。",
+  },
+  {
+    slug: "uk",
+    href: "/countries/uk",
+    label: "英国",
+    note: "MHRA 追踪",
+    badge: "欧洲",
+    summary: "英国监管公告、指南和药物安全动态。",
+  },
+];
 
 const demoContentItems: DbContentItem[] = [
   {
@@ -413,7 +772,7 @@ async function loadDiscussionDigests() {
 function mapDiscussionToDigest(discussion: Awaited<ReturnType<typeof loadDiscussionDigests>>[number]): DiscussionDigestData {
   return {
     slug: discussion.slug,
-    href: `/discussions/${discussion.slug}`,
+    href: `/feed?query=${encodeURIComponent(discussion.title)}`,
     title: discussion.title,
     summary: discussion.summary,
     status: discussion.status.replaceAll("_", " "),
@@ -422,6 +781,215 @@ function mapDiscussionToDigest(discussion: Awaited<ReturnType<typeof loadDiscuss
     answerCount: discussion.answers.length,
     updatedAtLabel: formatTimeAgo(discussion.updatedAt),
   };
+}
+
+async function loadFilteredContentItems(filters: FeedFilters = {}): Promise<DbContentItem[]> {
+  try {
+    const items = await loadContentItems();
+    const sourceItems = items.length > 0 ? items : demoContentItems;
+    return filterContentItems(sourceItems, filters);
+  } catch {
+    return filterContentItems(demoContentItems, filters);
+  }
+}
+
+async function loadDiscussionDigestsWithFallback(): Promise<DiscussionDigestData[]> {
+  try {
+    const discussions = await loadDiscussionDigests();
+    if (discussions.length === 0) {
+      return demoHomepage.discussions;
+    }
+
+    return discussions.map(mapDiscussionToDigest);
+  } catch {
+    return demoHomepage.discussions;
+  }
+}
+
+async function loadContentItemBySlug(slug: string): Promise<DbContentItem | undefined> {
+  try {
+    const items = await loadContentItems();
+    const sourceItems = items.length > 0 ? items : demoContentItems;
+    return sourceItems.find((item) => item.slug === slug);
+  } catch {
+    return demoContentItems.find((item) => item.slug === slug);
+  }
+}
+
+function findCatalogItem(
+  items: CatalogCardData[],
+  slug: string,
+  fallbackLabel: string,
+  basePath: `/${string}`,
+): CatalogCardData {
+  return (
+    items.find((item) => item.slug === slug) ?? {
+      slug,
+      href: `${basePath}/${slug}`,
+      label: slugToLabel(slug, fallbackLabel),
+      note: `${fallbackLabel}条目`,
+      badge: "关注",
+      summary: `这是 ${slugToLabel(slug, fallbackLabel)} 的默认介绍。`,
+    }
+  );
+}
+
+function buildSourcesFromContentItems(items: DbContentItem[]): CatalogCardData[] {
+  const seen = new Map<string, CatalogCardData>();
+
+  for (const item of items) {
+    if (seen.has(item.source.slug)) {
+      continue;
+    }
+
+    seen.set(item.source.slug, {
+      slug: item.source.slug,
+      href: `/sources/${item.source.slug}`,
+      label: item.source.name,
+      note: item.country?.name ?? "官方来源",
+      badge: item.contentType,
+      summary: `${item.source.name} 的最新发布入口。`,
+    });
+  }
+
+  return [...seen.values()].slice(0, 4);
+}
+
+function buildTopicsFromContentItems(items: DbContentItem[]): CatalogCardData[] {
+  const seen = new Map<string, CatalogCardData>();
+
+  for (const item of items) {
+    if (!item.primaryTopic || seen.has(item.primaryTopic.slug)) {
+      continue;
+    }
+
+    seen.set(item.primaryTopic.slug, {
+      slug: item.primaryTopic.slug,
+      href: `/topics/${item.primaryTopic.slug}`,
+      label: item.primaryTopic.name,
+      note: "相关领域",
+      badge: item.contentType,
+      summary: `${item.primaryTopic.name} 的监管更新和讨论入口。`,
+    });
+  }
+
+  return [...seen.values()].slice(0, 4);
+}
+
+function buildTopicSubtopics(slug: string): CatalogCardData[] {
+  switch (slug) {
+    case "clinical-trials":
+      return createSubtopicCards([
+        ["方案设计", "临床试验方案 / 终点 / 人群"],
+        ["去中心化临床", "远程访视 / 电子化 / 分散式"],
+        ["真实世界证据", "RWE / RWD / 外部对照"],
+        ["临床运营", "执行 / 监查 / 质量管理"],
+      ], `/feed?topic=${encodeURIComponent(slug)}`);
+    case "cmc-and-manufacturing":
+      return createSubtopicCards([
+        ["稳定性", "货架期 / 条件 / 方案"],
+        ["杂质控制", "工艺杂质 / 限度 / 监测"],
+        ["工艺验证", "验证策略 / 放行 / 变更"],
+        ["连续生产", "连续制造 / 自动化 / 控制"],
+      ], `/feed?topic=${encodeURIComponent(slug)}`);
+    case "registration-submission":
+      return createSubtopicCards([
+        ["eCTD", "结构 / 模块 / 提交"],
+        ["补充资料", "问询 / 响应 / 资料补交"],
+        ["审评沟通", "沟通机制 / 会议 / 路径"],
+        ["申报路径", "优先审评 / 加速通道 / 适应症"],
+      ], `/feed?topic=${encodeURIComponent(slug)}`);
+    case "labeling-and-insert":
+      return createSubtopicCards([
+        ["说明书格式", "版式 / 结构 / 更新"],
+        ["适应症", "适应症描述 / 边界 / 扩展"],
+        ["风险提示", "警示语 / 不良反应 / 监测"],
+        ["广告宣传", "合规 / 宣传限制 / 审核"],
+      ], `/feed?topic=${encodeURIComponent(slug)}`);
+    case "post-marketing":
+      return createSubtopicCards([
+        ["变更控制", "补充申请 / 重大变更 / 通知"],
+        ["再评价", "再审查 / 再评价 / 证据更新"],
+        ["上市后研究", "PMS / 真实世界 / 补充证据"],
+        ["风险管理", "RMP / 缓解措施 / 信号响应"],
+      ], `/feed?topic=${encodeURIComponent(slug)}`);
+    case "pharmacovigilance":
+      return createSubtopicCards([
+        ["信号识别", "信号检测 / 评估 / 上报"],
+        ["周期报告", "PSUR / PBRER / 递交"],
+        ["个例报告", "ICSR / 时限 / 质量"],
+        ["风险管理", "RMP / 风险最小化 / 沟通"],
+      ], `/feed?topic=${encodeURIComponent(slug)}`);
+    case "digital-ai-regulation":
+      return createSubtopicCards([
+        ["AI 辅助审评", "模型 / 评估 / 审评关注"],
+        ["数据治理", "数据可追溯 / 留痕 / 权限"],
+        ["模型验证", "验证 / 偏差 / 稳定性"],
+        ["数字工具", "软件 / 平台 / 数字化工具"],
+      ], `/feed?topic=${encodeURIComponent(slug)}`);
+    case "international-guidance":
+      return createSubtopicCards([
+        ["ICH", "国际协调 / 指南 / 共识"],
+        ["FDA / EMA", "跨区域对齐 / 监管口径"],
+        ["MHRA / PMDA", "区域经验 / 执行差异"],
+        ["指南解读", "二手解读 / 影响分析"],
+      ], `/feed?topic=${encodeURIComponent(slug)}`);
+    default:
+      return createSubtopicCards([
+        [slugToLabel(slug, "领域"), "默认子领域"],
+        ["最新更新", "按时间追踪"],
+        ["相关讨论", "社区问答"],
+      ], `/feed?topic=${encodeURIComponent(slug)}`);
+  }
+}
+
+function filterDiscussionsByKeyword(discussions: DiscussionDigestData[], keyword: string) {
+  const text = keyword.trim().toLowerCase();
+
+  return discussions.filter((discussion) => {
+    const haystack = `${discussion.title} ${discussion.summary} ${discussion.conclusion}`.toLowerCase();
+    return haystack.includes(text);
+  });
+}
+
+function mapContentToDetail(item: DbContentItem): ContentDetailData {
+  return {
+    slug: item.slug,
+    title: item.title,
+    summary: item.summary,
+    body: item.body ?? item.summary,
+    canonicalUrl: item.canonicalUrl,
+    contentTypeLabel: item.contentType,
+    publishedAtLabel: formatTimeAgo(item.publishedAt),
+    sourceName: item.source?.name ?? "未知来源",
+    sourceHref: `/sources/${item.source?.slug ?? ""}`,
+    countryName: item.country?.name ?? "全球",
+    countryHref: `/countries/${item.country?.slug ?? ""}`,
+    topicName: item.primaryTopic?.name ?? "未分类",
+    topicHref: `/topics/${item.primaryTopic?.slug ?? ""}`,
+    accent: pickAccent(item.contentType),
+  };
+}
+
+function createSubtopicCards(items: Array<[string, string]>, href: string): CatalogCardData[] {
+  return items.map(([label, summary], index) => ({
+    slug: `${label}-${index}`,
+    href,
+    label,
+    note: "小领域",
+    badge: `${index + 1}`,
+    summary,
+  }));
+}
+
+function slugToLabel(slug: string, fallbackLabel: string) {
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part[0]?.toUpperCase() + part.slice(1))
+    .join(" ")
+    .replace(/\bAi\b/g, "AI")
+    .replace(/\bCmc\b/g, "CMC") || fallbackLabel;
 }
 
 function filterContentItems(items: DbContentItem[], filters: FeedFilters) {
