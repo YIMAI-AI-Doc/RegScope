@@ -1,4 +1,6 @@
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
+import { getDiscussionStatusMeta } from "@/lib/discussions/status";
 
 export type IntelligenceCardData = {
   slug: string;
@@ -142,7 +144,13 @@ export type ContentPageData = {
   relatedDiscussions: DiscussionDigestData[];
 };
 
-type DbContentItem = Awaited<ReturnType<typeof loadContentItems>>[number];
+type DbContentItem = Prisma.ContentItemGetPayload<{
+  include: {
+    source: true;
+    country: true;
+    primaryTopic: true;
+  };
+}>;
 
 const demoHomepage: HomepageData = {
   alert: {
@@ -217,6 +225,20 @@ const demoHomepage: HomepageData = {
       note: "官方监管机构",
       badge: "RSS",
     },
+    {
+      slug: "pmda",
+      href: "/sources/pmda",
+      label: "日本 PMDA",
+      note: "官方监管机构",
+      badge: "RSS",
+    },
+    {
+      slug: "health-canada",
+      href: "/sources/health-canada",
+      label: "加拿大 Health Canada",
+      note: "官方监管机构",
+      badge: "ATOM",
+    },
   ],
   topicCards: [
     {
@@ -246,6 +268,20 @@ const demoHomepage: HomepageData = {
       label: "药物警戒",
       note: "持续更新",
       badge: "6",
+    },
+    {
+      slug: "registration-submission",
+      href: "/topics/registration-submission",
+      label: "注册申报",
+      note: "资料递交",
+      badge: "10",
+    },
+    {
+      slug: "international-guidance",
+      href: "/topics/international-guidance",
+      label: "国际协调与指南",
+      note: "跨区域对齐",
+      badge: "5",
     },
   ],
   countryCards: [
@@ -277,11 +313,25 @@ const demoHomepage: HomepageData = {
       note: "MHRA 追踪",
       badge: "欧洲",
     },
+    {
+      slug: "jp",
+      href: "/countries/jp",
+      label: "日本",
+      note: "PMDA 追踪",
+      badge: "亚太",
+    },
+    {
+      slug: "ca",
+      href: "/countries/ca",
+      label: "加拿大",
+      note: "Health Canada 追踪",
+      badge: "北美",
+    },
   ],
   discussions: [
     {
       slug: "ai-guidance-impact",
-      href: "/feed?query=AI%20%E6%8C%87%E5%8D%97%E5%AF%B9%E7%8E%B0%E6%9C%89%E7%94%B3%E6%8A%A5%E8%B7%AF%E5%BE%84%E7%9A%84%E5%BD%B1%E5%93%8D%E6%98%AF%E4%BB%80%E4%B9%88",
+      href: "/discussions/ai-guidance-impact",
       title: "AI 指南对现有申报路径的影响是什么？",
       summary: "需要优先判断它是立即改变流程，还是主要强化数据治理。",
       status: "已形成阶段性结论",
@@ -292,7 +342,7 @@ const demoHomepage: HomepageData = {
     },
     {
       slug: "cmc-change-control",
-      href: "/feed?query=CMC%20%E5%8F%98%E6%9B%B4%E6%8E%A7%E5%88%B6%E6%80%8E%E6%A0%B7%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E9%9C%80%E8%A6%81%E8%A1%A5%E5%85%85%E7%A8%B3%E5%AE%9A%E6%80%A7%E6%95%B0%E6%8D%AE",
+      href: "/discussions/cmc-change-control",
       title: "CMC 变更控制怎样判断是否需要补充稳定性数据？",
       summary: "不同地区对同类变更的证据要求不完全一致。",
       status: "讨论中",
@@ -300,6 +350,17 @@ const demoHomepage: HomepageData = {
       evidenceCount: 3,
       answerCount: 6,
       updatedAtLabel: "3 小时前",
+    },
+    {
+      slug: "labeling-digital-supplement",
+      href: "/discussions/labeling-digital-supplement",
+      title: "数字化标签补充信息可以替代纸面说明书更新吗？",
+      summary: "监管方普遍接受补充路径，但对主文件与数字补充信息的边界仍较谨慎。",
+      status: "已形成阶段性结论",
+      conclusion: "更现实的方向是让数字化内容承担补充说明，而不是替代主说明书的法定更新职责。",
+      evidenceCount: 2,
+      answerCount: 4,
+      updatedAtLabel: "5 小时前",
     },
   ],
   trending: [
@@ -340,8 +401,14 @@ export async function getHomepageData(): Promise<HomepageData> {
 
     return {
       ...demoHomepage,
-      featuredCards: contentItems.slice(0, 3).map(mapContentToCard),
-      discussions: discussions.slice(0, 2).map(mapDiscussionToDigest),
+      featuredCards:
+        contentItems.length > 0
+          ? contentItems.slice(0, 3).map(mapContentToCard)
+          : demoHomepage.featuredCards,
+      discussions:
+        discussions.length > 0
+          ? discussions.slice(0, 3).map(mapDiscussionToDigest)
+          : demoHomepage.discussions,
     };
   } catch {
     return demoHomepage;
@@ -649,6 +716,22 @@ const sourceCatalog: CatalogCardData[] = [
     badge: "RSS",
     summary: "英国药品和健康产品管理局的监管更新。",
   },
+  {
+    slug: "pmda",
+    href: "/sources/pmda",
+    label: "日本 PMDA",
+    note: "官方监管机构",
+    badge: "RSS",
+    summary: "日本 PMDA 的咨询、指导原则和审评相关更新。",
+  },
+  {
+    slug: "health-canada",
+    href: "/sources/health-canada",
+    label: "加拿大 Health Canada",
+    note: "官方监管机构",
+    badge: "ATOM",
+    summary: "加拿大卫生部的药品监管提醒、政策和通告。",
+  },
 ];
 
 const countryCatalog: CatalogCardData[] = [
@@ -684,63 +767,121 @@ const countryCatalog: CatalogCardData[] = [
     badge: "欧洲",
     summary: "英国监管公告、指南和药物安全动态。",
   },
+  {
+    slug: "jp",
+    href: "/countries/jp",
+    label: "日本",
+    note: "PMDA 追踪",
+    badge: "亚太",
+    summary: "日本审评咨询、指导原则和实施口径变化的入口。",
+  },
+  {
+    slug: "ca",
+    href: "/countries/ca",
+    label: "加拿大",
+    note: "Health Canada 追踪",
+    badge: "北美",
+    summary: "加拿大监管提醒、标签政策与药物警戒更新入口。",
+  },
 ];
 
 const demoContentItems: DbContentItem[] = [
-  {
+  createDemoContentItem({
     id: "demo-1",
     slug: "fda-ai-guidance",
     title: "FDA 更新 AI 监管草案，强调数据治理与可追溯性",
     summary: "围绕模型训练、验证、变更控制和文档留痕给出更明确的审评关注点。",
-    body: null,
     canonicalUrl: "https://www.fda.gov/demo/ai-guidance",
     contentType: "GUIDANCE",
-    publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    sourceId: "fda",
-    countryId: "us",
-    primaryTopicId: "digital-ai-regulation",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    source: { id: "fda", slug: "fda", name: "美国 FDA", countryId: "us" } as never,
-    country: { id: "us", slug: "us", name: "美国" } as never,
-    primaryTopic: { id: "digital-ai-regulation", slug: "digital-ai-regulation", name: "数字化与 AI 监管" } as never,
-  },
-  {
+    publishedHoursAgo: 2,
+    source: { id: "fda", slug: "fda", name: "美国 FDA", countryId: "us" },
+    country: { id: "us", slug: "us", name: "美国" },
+    topic: { id: "digital-ai-regulation", slug: "digital-ai-regulation", name: "数字化与 AI 监管" },
+  }),
+  createDemoContentItem({
     id: "demo-2",
     slug: "ema-cmc-update",
     title: "EMA 发出 CMC 变更管理提示，重申稳定性数据优先级",
     summary: "针对工艺、杂质和稳定性证据的提交方式做出更细的说明。",
-    body: null,
     canonicalUrl: "https://www.ema.europa.eu/demo/cmc-update",
     contentType: "POLICY",
-    publishedAt: new Date(Date.now() - 10 * 60 * 60 * 1000),
-    sourceId: "ema",
-    countryId: "eu",
-    primaryTopicId: "cmc-and-manufacturing",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    source: { id: "ema", slug: "ema", name: "欧盟 EMA", countryId: "eu" } as never,
-    country: { id: "eu", slug: "eu", name: "欧盟" } as never,
-    primaryTopic: { id: "cmc-and-manufacturing", slug: "cmc-and-manufacturing", name: "CMC 与生产" } as never,
-  },
-  {
+    publishedHoursAgo: 10,
+    source: { id: "ema", slug: "ema", name: "欧盟 EMA", countryId: "eu" },
+    country: { id: "eu", slug: "eu", name: "欧盟" },
+    topic: { id: "cmc-and-manufacturing", slug: "cmc-and-manufacturing", name: "CMC 与生产" },
+  }),
+  createDemoContentItem({
     id: "demo-3",
     slug: "nmpa-labeling-note",
     title: "NMPA 说明书格式调整进入征求意见阶段",
     summary: "标签与说明书的结构化表达、风险提示和适应症描述成为重点。",
-    body: null,
     canonicalUrl: "https://www.nmpa.gov.cn/demo/labeling",
     contentType: "POLICY",
-    publishedAt: new Date(Date.now() - 30 * 60 * 60 * 1000),
-    sourceId: "nmpa",
-    countryId: "cn",
-    primaryTopicId: "labeling-and-insert",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    source: { id: "nmpa", slug: "nmpa", name: "中国 NMPA", countryId: "cn" } as never,
-    country: { id: "cn", slug: "cn", name: "中国" } as never,
-    primaryTopic: { id: "labeling-and-insert", slug: "labeling-and-insert", name: "标签与说明书" } as never,
-  },
+    publishedHoursAgo: 30,
+    source: { id: "nmpa", slug: "nmpa", name: "中国 NMPA", countryId: "cn" },
+    country: { id: "cn", slug: "cn", name: "中国" },
+    topic: { id: "labeling-and-insert", slug: "labeling-and-insert", name: "标签与说明书" },
+  }),
+  createDemoContentItem({
+    id: "demo-4",
+    slug: "mhra-decentralized-trial-note",
+    title: "MHRA 补充去中心化临床执行预期",
+    summary: "远程访视、电子知情和异常场景处理成为审查重点。",
+    canonicalUrl: "https://www.gov.uk/demo/decentralized-trial-note",
+    contentType: "GUIDANCE",
+    publishedHoursAgo: 38,
+    source: { id: "mhra", slug: "mhra", name: "英国 MHRA", countryId: "uk" },
+    country: { id: "uk", slug: "uk", name: "英国" },
+    topic: { id: "clinical-trials", slug: "clinical-trials", name: "临床试验" },
+  }),
+  createDemoContentItem({
+    id: "demo-5",
+    slug: "pmda-rwe-brief",
+    title: "PMDA 提醒真实世界证据项目尽早界定方法学边界",
+    summary: "数据适用性、外部对照和偏倚控制成为咨询前准备重点。",
+    canonicalUrl: "https://www.pmda.go.jp/demo/rwe-brief",
+    contentType: "NEWS",
+    publishedHoursAgo: 46,
+    source: { id: "pmda", slug: "pmda", name: "日本 PMDA", countryId: "jp" },
+    country: { id: "jp", slug: "jp", name: "日本" },
+    topic: { id: "clinical-trials", slug: "clinical-trials", name: "临床试验" },
+  }),
+  createDemoContentItem({
+    id: "demo-6",
+    slug: "health-canada-pv-alert",
+    title: "Health Canada 重申严重不良反应时限要求",
+    summary: "安全性报告时限、升级路径和补充材料要求被重新强调。",
+    canonicalUrl: "https://www.canada.ca/demo/pv-alert",
+    contentType: "ALERT",
+    publishedHoursAgo: 56,
+    source: { id: "health-canada", slug: "health-canada", name: "加拿大 Health Canada", countryId: "ca" },
+    country: { id: "ca", slug: "ca", name: "加拿大" },
+    topic: { id: "pharmacovigilance", slug: "pharmacovigilance", name: "药物警戒" },
+  }),
+  createDemoContentItem({
+    id: "demo-7",
+    slug: "fda-ectd-validation-note",
+    title: "FDA 更新 eCTD 验证提示，强调递交前一致性检查",
+    summary: "模块映射、命名与生命周期操作错误被列为高频问题。",
+    canonicalUrl: "https://www.fda.gov/demo/ectd-validation-note",
+    contentType: "POLICY",
+    publishedHoursAgo: 66,
+    source: { id: "fda", slug: "fda", name: "美国 FDA", countryId: "us" },
+    country: { id: "us", slug: "us", name: "美国" },
+    topic: { id: "registration-submission", slug: "registration-submission", name: "注册申报" },
+  }),
+  createDemoContentItem({
+    id: "demo-8",
+    slug: "ema-rmp-update",
+    title: "EMA 更新风险管理计划模板实施说明",
+    summary: "上市后管理与风险最小化措施的对应关系要求更清晰。",
+    canonicalUrl: "https://www.ema.europa.eu/demo/rmp-update",
+    contentType: "GUIDANCE",
+    publishedHoursAgo: 80,
+    source: { id: "ema", slug: "ema", name: "欧盟 EMA", countryId: "eu" },
+    country: { id: "eu", slug: "eu", name: "欧盟" },
+    topic: { id: "post-marketing", slug: "post-marketing", name: "上市后管理" },
+  }),
 ];
 
 async function loadContentItems(): Promise<DbContentItem[]> {
@@ -770,12 +911,14 @@ async function loadDiscussionDigests() {
 }
 
 function mapDiscussionToDigest(discussion: Awaited<ReturnType<typeof loadDiscussionDigests>>[number]): DiscussionDigestData {
+  const statusMeta = getDiscussionStatusMeta(discussion.status);
+
   return {
     slug: discussion.slug,
-    href: `/feed?query=${encodeURIComponent(discussion.title)}`,
+    href: `/discussions/${discussion.slug}`,
     title: discussion.title,
     summary: discussion.summary,
-    status: discussion.status.replaceAll("_", " "),
+    status: statusMeta.label,
     conclusion: discussion.conclusion?.summary ?? "当前还在收集证据，建议先查看官方原文和高票回复。",
     evidenceCount: discussion.evidence.length,
     answerCount: discussion.answers.length,
@@ -980,6 +1123,51 @@ function createSubtopicCards(items: Array<[string, string]>, href: string): Cata
     badge: `${index + 1}`,
     summary,
   }));
+}
+
+function createDemoContentItem({
+  id,
+  slug,
+  title,
+  summary,
+  canonicalUrl,
+  contentType,
+  publishedHoursAgo,
+  source,
+  country,
+  topic,
+}: {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  canonicalUrl: string;
+  contentType: DbContentItem["contentType"];
+  publishedHoursAgo: number;
+  source: { id: string; slug: string; name: string; countryId: string | null };
+  country: { id: string; slug: string; name: string };
+  topic: { id: string; slug: string; name: string };
+}): DbContentItem {
+  const publishedAt = new Date(Date.now() - publishedHoursAgo * 60 * 60 * 1000);
+
+  return {
+    id,
+    slug,
+    title,
+    summary,
+    body: null,
+    canonicalUrl,
+    contentType,
+    publishedAt,
+    sourceId: source.id,
+    countryId: country.id,
+    primaryTopicId: topic.id,
+    createdAt: publishedAt,
+    updatedAt: publishedAt,
+    source: source as never,
+    country: country as never,
+    primaryTopic: topic as never,
+  };
 }
 
 function slugToLabel(slug: string, fallbackLabel: string) {

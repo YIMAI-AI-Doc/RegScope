@@ -38,7 +38,7 @@ vi.mock("@/lib/content/queries", () => ({
         href: "/discussions/discussion-1",
         title: "测试讨论",
         summary: "测试讨论摘要",
-        status: "讨论中",
+        status: "待讨论",
         conclusion: "测试结论",
         evidenceCount: 2,
         answerCount: 3,
@@ -61,6 +61,14 @@ describe("HomePage", () => {
     expect(screen.getByText("测试资讯卡片")).toBeInTheDocument();
     expect(screen.getByText("官方来源")).toBeInTheDocument();
     expect(screen.getByText("精选讨论摘要")).toBeInTheDocument();
+    expect(screen.getByText("测试讨论摘要")).toBeInTheDocument();
+    expect(screen.getByText("测试结论")).toBeInTheDocument();
+    expect(screen.getByText("待讨论")).toBeInTheDocument();
+    expect(screen.getByText("3 条回答 · 2 条证据")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "测试讨论" })).toHaveAttribute(
+      "href",
+      "/discussions/discussion-1",
+    );
     expect(screen.getByText("趋势榜单")).toBeInTheDocument();
   });
 });

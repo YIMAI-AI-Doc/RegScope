@@ -101,15 +101,32 @@ export default async function HomePage() {
               <article
                 key={discussion.slug}
                 style={{
+                  border: "1px solid rgba(31, 79, 134, 0.08)",
                   borderRadius: "18px",
                   background: "rgba(31, 79, 134, 0.04)",
                   padding: "18px",
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
-                  <h3 style={{ margin: 0, fontSize: "1.04rem" }}>{discussion.title}</h3>
+                  <span
+                    style={{
+                      borderRadius: "999px",
+                      padding: "5px 10px",
+                      background: "rgba(31, 79, 134, 0.08)",
+                      color: "var(--accent)",
+                      fontSize: "0.8rem",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {discussion.status}
+                  </span>
                   <span style={{ color: "var(--muted)", fontSize: "0.88rem" }}>{discussion.updatedAtLabel}</span>
                 </div>
+                <h3 style={{ margin: "12px 0 0", fontSize: "1.04rem" }}>
+                  <Link href={discussion.href} style={{ color: "inherit", textDecoration: "none" }}>
+                    {discussion.title}
+                  </Link>
+                </h3>
                 <p style={{ margin: "8px 0 0", lineHeight: 1.7, color: "var(--muted)" }}>
                   {discussion.summary}
                 </p>
@@ -117,9 +134,23 @@ export default async function HomePage() {
                   <strong>当前结论：</strong>
                   {discussion.conclusion}
                 </p>
-                <p style={{ margin: "8px 0 0", color: "var(--muted)", fontSize: "0.92rem" }}>
-                  {discussion.status} · {discussion.evidenceCount} 条证据 · {discussion.answerCount} 条回答
-                </p>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "12px",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    marginTop: "10px",
+                  }}
+                >
+                  <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.92rem" }}>
+                    {discussion.answerCount} 条回答 · {discussion.evidenceCount} 条证据
+                  </p>
+                  <Link href={discussion.href} style={{ color: "var(--accent)", fontWeight: 700 }}>
+                    进入讨论
+                  </Link>
+                </div>
               </article>
             ))}
           </div>

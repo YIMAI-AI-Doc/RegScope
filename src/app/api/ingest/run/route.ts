@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { getAuthSecret, getIngestSecret } from "@/lib/auth";
 import { runAllFeeds } from "@/workers/ingest/run-all-feeds";
-
-function getIngestSecret() {
-  return process.env.REGSCOPE_INGEST_SECRET ?? process.env.NEXTAUTH_SECRET ?? "";
-}
 
 async function isAuthorized(request: NextRequest) {
   const secret = request.headers.get("x-regscope-ingest-secret");
@@ -12,7 +9,7 @@ async function isAuthorized(request: NextRequest) {
     return true;
   }
 
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  const token = await getToken({ req: request, secret: getAuthSecret() });
   return (token as { role?: string } | null)?.role === "ADMIN";
 }
 

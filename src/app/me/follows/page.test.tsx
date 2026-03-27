@@ -6,6 +6,10 @@ vi.mock("next-auth", () => ({
   getServerSession: vi.fn(),
 }));
 
+vi.mock("next/navigation", () => ({
+  redirect: vi.fn(),
+}));
+
 vi.mock("@/lib/db", () => ({
   prisma: {
     user: {
@@ -18,24 +22,28 @@ vi.mock("@/lib/db", () => ({
 }));
 
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import FollowCenterPage from "./page";
 
 const mockedGetServerSession = vi.mocked(getServerSession);
+const mockedRedirect = vi.mocked(redirect);
 const mockedPrisma = vi.mocked(prisma, { deep: true });
+const redirectSignal = new Error("NEXT_REDIRECT");
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockedRedirect.mockImplementation(() => {
+    throw redirectSignal;
+  });
 });
 
 describe("FollowCenterPage", () => {
-  it("shows the anonymous prompt when not logged in", async () => {
+  it("redirects anonymous users to sign in", async () => {
     mockedGetServerSession.mockResolvedValue(null as never);
 
-    render(await FollowCenterPage());
-
-    expect(screen.getByRole("heading", { name: "登录后管理关注" })).toBeInTheDocument();
-    expect(screen.getByText("你还未登录")).toBeInTheDocument();
+    await expect(FollowCenterPage()).rejects.toThrow("NEXT_REDIRECT");
+    expect(mockedRedirect).toHaveBeenCalledWith("/api/auth/signin?callbackUrl=%2Fme%2Ffollows");
   });
 
   it("renders followed sources, countries, and topics for a logged-in user", async () => {

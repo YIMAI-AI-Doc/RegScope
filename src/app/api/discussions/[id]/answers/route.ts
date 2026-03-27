@@ -1,6 +1,7 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { getAuthSecret } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { evidenceLabelValues } from "@/lib/discussions/status";
 
@@ -10,7 +11,7 @@ const createAnswerSchema = z.object({
 });
 
 async function requireSessionUser(request: NextRequest) {
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET ?? "regscope-dev-secret" });
+  const token = await getToken({ req: request, secret: getAuthSecret() });
 
   if (!token?.email) {
     return null;

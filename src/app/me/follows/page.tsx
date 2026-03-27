@@ -2,6 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
@@ -15,7 +16,7 @@ export default async function FollowCenterPage() {
   const email = session?.user?.email;
 
   if (!email) {
-    return <AnonymousState />;
+    redirect("/api/auth/signin?callbackUrl=%2Fme%2Ffollows");
   }
 
   const user = await prisma.user.upsert({
@@ -90,39 +91,6 @@ export default async function FollowCenterPage() {
   );
 }
 
-function AnonymousState() {
-  return (
-    <div style={{ display: "grid", gap: "24px" }}>
-      <section style={{ display: "grid", gap: "10px" }}>
-        <p style={{ margin: 0, color: "var(--accent)", fontWeight: 700, letterSpacing: "0.08em" }}>
-          我的关注
-        </p>
-        <h1 style={{ margin: 0, fontSize: "clamp(1.9rem, 4vw, 3rem)", lineHeight: 1.1 }}>
-          登录后管理关注
-        </h1>
-        <p style={{ margin: 0, maxWidth: "66ch", color: "var(--muted)", lineHeight: 1.8 }}>
-          游客可以直接浏览内容；登录后才能关注国家、机构和领域。
-        </p>
-      </section>
-
-      <section style={panelStyle}>
-        <h2 style={{ margin: 0 }}>你还未登录</h2>
-        <p style={{ margin: "10px 0 0", color: "var(--muted)", lineHeight: 1.7 }}>
-          登录后，你可以保存关注项并在首页收到个性化更新。
-        </p>
-        <div style={{ display: "flex", gap: "12px", marginTop: "18px", flexWrap: "wrap" }}>
-          <Link href="/topics" style={primaryButtonStyle}>
-            先浏览领域
-          </Link>
-          <Link href="/sources" style={secondaryButtonStyle}>
-            查看官方来源
-          </Link>
-        </div>
-      </section>
-    </div>
-  );
-}
-
 function FollowGroup({
   title,
   items,
@@ -193,22 +161,6 @@ const followCardStyle: React.CSSProperties = {
   padding: "16px",
   display: "grid",
   gap: "8px",
-};
-
-const primaryButtonStyle: React.CSSProperties = {
-  borderRadius: "12px",
-  background: "linear-gradient(135deg, #1f4f86, #2f6aa8)",
-  color: "#fff",
-  padding: "10px 16px",
-  fontWeight: 700,
-};
-
-const secondaryButtonStyle: React.CSSProperties = {
-  borderRadius: "12px",
-  border: "1px solid var(--border)",
-  color: "var(--text)",
-  padding: "10px 16px",
-  fontWeight: 700,
 };
 
 const actionLinkStyle: React.CSSProperties = {

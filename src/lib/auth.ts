@@ -23,12 +23,20 @@ const placeholderEmailConfig = {
   from: process.env.EMAIL_FROM ?? "RegScope <noreply@regscope.local>",
 };
 
+export function getAuthSecret() {
+  return process.env.NEXTAUTH_SECRET ?? "regscope-dev-secret";
+}
+
+export function getIngestSecret() {
+  return process.env.REGSCOPE_INGEST_SECRET ?? getAuthSecret();
+}
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
   providers: [],
-  secret: process.env.NEXTAUTH_SECRET ?? "regscope-dev-secret",
+  secret: getAuthSecret(),
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
