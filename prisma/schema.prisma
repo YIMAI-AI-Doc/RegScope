@@ -48,12 +48,17 @@ model User {
   email        String        @unique
   name         String?
   role         String        @default("USER")
+  avatarUrl    String?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   follows      Follow[]
   discussions  Discussion[]
   answers      Answer[]
+  answerVotes  AnswerVote[]
+  discussionViews DiscussionView[]
   conclusions  DiscussionConclusion[] @relation("ConclusionEditedBy")
+  contentFavorites    ContentFavorite[]
+  discussionFavorites DiscussionFavorite[]
 }
 
 model Country {
@@ -119,6 +124,7 @@ model ContentItem {
   primaryTopic   Topic?      @relation(fields: [primaryTopicId], references: [id], onDelete: SetNull)
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
+  favorites      ContentFavorite[]
 }
 
 model Follow {
@@ -155,6 +161,8 @@ model Discussion {
   conclusion   DiscussionConclusion?
   evidence     DiscussionEvidence[]
   answers      Answer[]
+  views        DiscussionView[]
+  favorites    DiscussionFavorite[]
 }
 
 model DiscussionConclusion {
@@ -189,10 +197,66 @@ model Answer {
   authorId      String
   author        User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
   body          String
-  evidenceLabel EvidenceLabel     @default(UNVERIFIED)
+  evidenceLabel EvidenceLabel    @default(UNVERIFIED)
   isAccepted    Boolean          @default(false)
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
+  votes         AnswerVote[]
 
   @@unique([discussionId, authorId, body])
+}
+
+model DiscussionView {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  discussionId  String
+  discussion    Discussion  @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  viewCount     Int         @default(1)
+  createdAt     DateTime    @default(now())
+  lastViewedAt  DateTime    @updatedAt
+
+  @@unique([userId, discussionId])
+  @@index([userId, lastViewedAt])
+  @@index([discussionId, lastViewedAt])
+}
+
+model AnswerVote {
+  id         String    @id @default(cuid())
+  answerId   String
+  answer     Answer    @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  value      Int
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([answerId, userId])
+  @@index([userId, updatedAt])
+}
+
+model ContentFavorite {
+  id         String      @id @default(cuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contentId  String
+  content    ContentItem @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  createdAt  DateTime    @default(now())
+
+  @@unique([userId, contentId])
+  @@index([userId, createdAt])
+  @@index([contentId, createdAt])
+}
+
+model DiscussionFavorite {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  discussionId  String
+  discussion    Discussion  @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+
+  @@unique([userId, discussionId])
+  @@index([userId, createdAt])
+  @@index([discussionId, createdAt])
 }

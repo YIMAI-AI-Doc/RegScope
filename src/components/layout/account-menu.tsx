@@ -9,6 +9,7 @@ export type AccountMenuViewer = {
   name?: string | null;
   email?: string | null;
   role?: string | null;
+  avatarUrl?: string | null;
 };
 
 export type AccountMenuStats = {
@@ -25,7 +26,8 @@ type AccountMenuProps = {
 export function AccountMenu({ viewer, stats }: AccountMenuProps) {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [open, setOpen] = useState(false);
+  const [stickyOpen, setStickyOpen] = useState(false);
+  const [hoverOpen, setHoverOpen] = useState(false);
   const [email, setEmail] = useState(viewer.email ?? "demo@regscope.local");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -34,12 +36,14 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
     const value = (viewer.name ?? viewer.email ?? "G").trim();
     return value.length > 0 ? value.slice(0, 1).toUpperCase() : "G";
   }, [viewer.email, viewer.name]);
+  const avatar = viewer.avatarUrl ?? null;
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
       if (!containerRef.current) return;
       if (!containerRef.current.contains(event.target as Node)) {
-        setOpen(false);
+        setStickyOpen(false);
+        setHoverOpen(false);
       }
     }
     window.addEventListener("pointerdown", handlePointerDown);
@@ -61,7 +65,8 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
     }
 
     startTransition(() => {
-      setOpen(false);
+      setStickyOpen(false);
+      setHoverOpen(false);
       setPassword("");
       router.refresh();
     });
@@ -77,13 +82,24 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
     }
 
     startTransition(() => {
-      setOpen(false);
+      setStickyOpen(false);
+      setHoverOpen(false);
       router.refresh();
     });
   }
 
+  const isOpen = stickyOpen || hoverOpen;
+
   return (
-    <div ref={containerRef} style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+    <div
+      ref={containerRef}
+      className="account-menu"
+      data-open={isOpen ? "true" : "false"}
+      style={{ position: "relative", display: "inline-flex", alignItems: "center" }}
+      onMouseEnter={() => setHoverOpen(true)}
+      onMouseLeave={() => setHoverOpen(false)}
+    >
+      <span className="account-touchpad" aria-hidden="true" />
       <button
         type="button"
         onClick={() => {
@@ -91,10 +107,10 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
             router.push("/me");
             return;
           }
-          setOpen((value) => !value);
+          setStickyOpen((value) => !value);
         }}
         aria-haspopup="menu"
-        aria-expanded={open}
+        aria-expanded={isOpen}
         title={viewer.isAuthenticated ? "进入个人中心" : "登录"}
         style={{
           border: "1px solid rgba(104, 132, 171, 0.34)",
@@ -104,16 +120,19 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
           display: "grid",
           placeItems: "center",
           background:
-            viewer.isAuthenticated
+            viewer.isAuthenticated && avatar
+              ? `center/cover no-repeat url(${avatar})`
+              : viewer.isAuthenticated
               ? "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(31,79,134,0.16) 60%), linear-gradient(135deg, rgba(31,79,134,0.22), rgba(47,106,168,0.12))"
               : "linear-gradient(135deg, rgba(31,79,134,0.14), rgba(47,106,168,0.08))",
           color: "var(--accent)",
           fontWeight: 800,
           cursor: "pointer",
           position: "relative",
+          zIndex: 1,
         }}
       >
-        <span style={{ fontSize: "0.95rem", letterSpacing: "0.02em" }}>{viewer.isAuthenticated ? initials : "客"}</span>
+        {!avatar ? <span style={{ fontSize: "0.95rem", letterSpacing: "0.02em" }}>{viewer.isAuthenticated ? initials : "客"}</span> : null}
         <span
           aria-hidden="true"
           style={{
@@ -130,7 +149,7 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
         />
       </button>
 
-      {open ? (
+      {isOpen ? (
         <div
           role="menu"
           aria-label="账户面板"
@@ -165,14 +184,17 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
                   display: "grid",
                   placeItems: "center",
                   background:
-                    "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.92), rgba(31,79,134,0.20) 60%), linear-gradient(135deg, rgba(31,79,134,0.26), rgba(47,106,168,0.14))",
+                    avatar
+                      ? `center/cover no-repeat url(${avatar})`
+                      : "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.92), rgba(31,79,134,0.20) 60%), linear-gradient(135deg, rgba(31,79,134,0.26), rgba(47,106,168,0.14))",
                   border: "1px solid rgba(104, 132, 171, 0.26)",
                   color: "var(--accent)",
                   fontWeight: 900,
                   fontSize: "1.2rem",
+                  overflow: "hidden",
                 }}
               >
-                {viewer.isAuthenticated ? initials : "客"}
+                {!avatar ? (viewer.isAuthenticated ? initials : "客") : null}
               </div>
               <div style={{ display: "grid", gap: "4px", minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>

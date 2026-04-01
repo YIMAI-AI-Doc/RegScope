@@ -2,12 +2,12 @@ import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { IntelligenceCard } from "@/components/cards/intelligence-card";
-import { TopicCard } from "@/components/cards/topic-card";
+import { TopicBrowser } from "@/components/topics/topic-browser";
 import { getTopicDirectoryData } from "@/lib/content/queries";
 
 export const metadata: Metadata = {
   title: "领域订阅 | RegScope",
-  description: "浏览全球医药监管细分领域，查看最新内容和相关讨论。",
+  description: "按大领域和小领域浏览全球医药监管领域，并查看最新相关内容。",
 };
 
 export default async function TopicsPage() {
@@ -21,26 +21,16 @@ export default async function TopicsPage() {
         <p style={{ margin: 0, maxWidth: "66ch", color: "var(--muted)", lineHeight: 1.8 }}>{data.summary}</p>
       </section>
 
-      <section style={{ display: "grid", gap: "14px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
-          <h2 style={{ margin: 0 }}>小领域矩阵</h2>
-          <span style={{ color: "var(--muted)" }}>{data.cards.length} 项</span>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>
-          {data.cards.map((card) => (
-            <TopicCard key={card.slug} {...card} />
-          ))}
-        </div>
-      </section>
+      <TopicBrowser groups={data.topicGroups} mode="directory" />
 
       <section style={{ display: "grid", gap: "14px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
           <h2 style={{ margin: 0 }}>最新内容</h2>
-          <Link href="/feed" style={{ color: "var(--accent)", fontWeight: 700 }}>
-            查看全部快讯
+          <Link href="/feed?tab=intelligence" style={{ color: "var(--accent)", fontWeight: 700 }}>
+            查看情报结果页
           </Link>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "18px" }}>
+        <div className="regscope-grid-three">
           {data.latestContent.map((item) => (
             <IntelligenceCard key={item.slug} {...item} />
           ))}

@@ -26,84 +26,91 @@ type IntelligenceCardProps = IntelligenceCardData;
 export function IntelligenceCard({
   href,
   title,
-  summary,
   sourceName,
   countryName,
-  topicName,
   contentTypeLabel,
   publishedAtLabel,
   accent,
 }: IntelligenceCardProps) {
   const accentStyles = accentMap[accent];
+  const cardHeight = "clamp(220px, 22vw, 246px)";
+  const coverHeight = "clamp(112px, 12vw, 136px)";
 
   return (
     <article
       style={{
         border: "1px solid var(--border)",
-        borderRadius: "24px",
+        borderRadius: "22px",
         overflow: "hidden",
         background: "var(--panel-strong)",
-        boxShadow: "0 16px 36px rgba(31, 55, 90, 0.08)",
+        boxShadow: "0 14px 30px rgba(31, 55, 90, 0.08)",
         transition: "transform 180ms ease, box-shadow 180ms ease",
+        height: cardHeight,
       }}
     >
-      <Link href={href} style={{ color: "inherit", display: "block" }}>
+      <Link href={href} style={{ color: "inherit", display: "flex", flexDirection: "column", height: "100%" }}>
         <div
           style={{
-            aspectRatio: "16 / 9",
+            height: coverHeight,
             background: `${accentStyles.cover}`,
-            padding: "18px",
+            padding: "12px",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
             color: "#fff",
           }}
         >
-          <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "flex-start" }}>
             <span
               style={{
-                padding: "6px 10px",
+                padding: "5px 9px",
                 borderRadius: "999px",
                 background: accentStyles.chip,
-                fontSize: "0.8rem",
+                fontSize: "0.78rem",
                 fontWeight: 600,
               }}
             >
               {contentTypeLabel}
             </span>
-            <span style={{ fontSize: "0.84rem", opacity: 0.9 }}>{publishedAtLabel}</span>
           </div>
           <div>
-            <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.88 }}>{countryName}</p>
-            <p style={{ margin: "6px 0 0", fontSize: "1.08rem", lineHeight: 1.4, fontWeight: 700 }}>
-              {title}
-            </p>
+            <p style={{ margin: 0, fontSize: "0.88rem", opacity: 0.9 }}>{countryName}</p>
           </div>
         </div>
-        <div style={{ padding: "18px 18px 20px" }}>
-          <div
+        <div style={{ padding: "12px 14px 14px", display: "grid", gap: "6px", flex: 1, alignContent: "start" }}>
+          <p
             style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "8px",
-              marginBottom: "12px",
-              fontSize: "0.82rem",
+              margin: 0,
+              fontSize: "0.98rem",
+              lineHeight: 1.45,
+              fontWeight: 700,
+              color: "var(--text)",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              height: "2.9em",
+              maxHeight: "2.9em",
             }}
           >
-            <span style={pillStyle}>{sourceName}</span>
-            <span style={pillStyle}>{topicName}</span>
-          </div>
-          <p style={{ margin: 0, lineHeight: 1.75, color: "var(--text)" }}>{summary}</p>
+            {title}
+          </p>
+          <p
+            style={{
+              margin: 0,
+              color: "var(--muted)",
+              fontSize: "0.82rem",
+              lineHeight: 1.35,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+            title={`${countryName} ${sourceName} · ${publishedAtLabel}`}
+          >
+            {countryName} {sourceName} · {publishedAtLabel}
+          </p>
         </div>
       </Link>
     </article>
   );
 }
-
-const pillStyle: React.CSSProperties = {
-  borderRadius: "999px",
-  padding: "6px 10px",
-  background: "rgba(31, 79, 134, 0.06)",
-  color: "var(--accent)",
-  fontWeight: 600,
-};

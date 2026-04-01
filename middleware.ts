@@ -1,10 +1,14 @@
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getAuthSecret, getIngestSecret } from "@/lib/auth";
+import { getAuthSecret, getIngestSecret } from "@/lib/auth-secrets";
 import { canAccessOpsRoute } from "@/lib/permissions";
 
 function isProtectedWriteApi(pathname: string, method: string) {
+  if (method !== "POST" && method !== "DELETE") {
+    return false;
+  }
+
   if (pathname === "/api/follows") {
     return method === "POST" || method === "DELETE";
   }
@@ -13,7 +17,15 @@ function isProtectedWriteApi(pathname: string, method: string) {
     return method === "POST";
   }
 
-  return method === "POST" && /^\/api\/discussions\/[^/]+\/answers$/.test(pathname);
+  if (/^\/api\/discussions\/[^/]+\/answers$/.test(pathname)) {
+    return method === "POST";
+  }
+
+  if (/^\/api\/answers\/[^/]+\/(vote|accept)$/.test(pathname)) {
+    return method === "POST";
+  }
+
+  return false;
 }
 
 function unauthorizedJson() {
@@ -68,6 +80,7 @@ export const config = {
   matcher: [
     "/me/follows",
     "/api/follows",
+    "/api/answers/:path*",
     "/api/discussions",
     "/api/discussions/:path*",
     "/api/ingest/run",

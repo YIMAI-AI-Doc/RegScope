@@ -228,17 +228,15 @@ a {
   align-content: start;
   gap: 8px;
   padding: 14px;
-  border: 1px solid rgba(97, 126, 118, 0.18);
+  border: 1px solid rgba(150, 176, 188, 0.22);
   border-radius: 22px;
-  color: #fff;
+  color: #111;
   background:
-    radial-gradient(circle at 18% 18%, rgba(255, 208, 170, 0.18), transparent 20%),
-    radial-gradient(circle at 84% 14%, rgba(170, 219, 197, 0.16), transparent 22%),
-    linear-gradient(135deg, #344e44 0%, #446458 28%, #5f7e71 56%, #728f80 100%),
-    linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.14));
-  box-shadow: 0 20px 44px rgba(58, 84, 71, 0.18);
+    radial-gradient(circle at 14% 18%, rgba(255, 210, 170, 0.18), transparent 22%),
+    radial-gradient(circle at 82% 12%, rgba(180, 215, 240, 0.20), transparent 24%),
+    linear-gradient(135deg, #f7fbff 0%, #f3f9f6 45%, #eef4ff 100%);
+  box-shadow: 0 14px 32px rgba(120, 148, 170, 0.14);
   overflow: hidden;
-  backdrop-filter: blur(4px);
 }
 
 .homepage-hot-kicker {
@@ -279,6 +277,7 @@ a {
   background: transparent;
   border: none;
   box-shadow: none;
+  color: #111;
   transition: opacity 160ms ease;
 }
 
@@ -318,14 +317,14 @@ a {
 }
 
 .homepage-hot-kind {
-  background: rgba(255, 255, 255, 0.16);
-  color: rgba(255, 249, 244, 0.96);
+  background: rgba(28, 44, 52, 0.08);
+  color: #42554f;
 }
 
 .homepage-hot-title {
   font-size: 0.92rem;
   line-height: 1.4;
-  color: #fff;
+  color: #111;
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;

@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getDiscussionStatusMeta } from "@/lib/discussions/status";
+import { topLevelTopics } from "@/lib/taxonomy/constants";
 
 export type IntelligenceCardData = {
   slug: string;
@@ -35,18 +36,45 @@ export type DiscussionDigestData = {
   updatedAtLabel: string;
 };
 
+export type HotClusterItemData = {
+  rank: number;
+  href: string;
+  title: string;
+  kind: "intelligence" | "discussion";
+  kindLabel: string;
+  meta: string;
+  heatLabel: string;
+};
+
+export type AccountCardData = {
+  slug: string;
+  href: string;
+  label: string;
+  note: string;
+  summary: string;
+  badge?: string;
+  targetType: "SOURCE" | "COUNTRY";
+  recentCountLabel: string;
+};
+
+export type TopicGroupData = {
+  slug: string;
+  label: string;
+  description: string;
+  children: CatalogCardData[];
+};
+
 export type HomepageData = {
   alert: {
     title: string;
     summary: string;
     meta: string;
   };
+  hotCluster: HotClusterItemData[];
   featuredCards: IntelligenceCardData[];
-  officialSources: SmallCardData[];
-  topicCards: SmallCardData[];
-  countryCards: SmallCardData[];
+  accountCards: AccountCardData[];
+  topicGroups: TopicGroupData[];
   discussions: DiscussionDigestData[];
-  trending: SmallCardData[];
 };
 
 export type FeedFilters = {
@@ -56,11 +84,20 @@ export type FeedFilters = {
   contentType?: string;
   timeRange?: string;
   query?: string;
+  tab?: SearchTabKey;
 };
 
+export type SearchTabKey = "all" | "intelligence" | "accounts" | "topics" | "discussions";
+
 export type FeedPageData = {
+  query: string;
+  activeTab: SearchTabKey;
   items: IntelligenceCardData[];
+  accountResults: AccountCardData[];
+  topicResults: CatalogCardData[];
+  discussionResults: DiscussionDigestData[];
   total: number;
+  tabCounts: Record<SearchTabKey, number>;
   filters: {
     countries: SmallCardData[];
     sources: SmallCardData[];
@@ -77,7 +114,7 @@ export type CatalogCardData = SmallCardData & {
 export type TopicDirectoryData = {
   title: string;
   summary: string;
-  cards: CatalogCardData[];
+  topicGroups: TopicGroupData[];
   latestContent: IntelligenceCardData[];
   relatedDiscussions: DiscussionDigestData[];
 };
@@ -158,6 +195,7 @@ const demoHomepage: HomepageData = {
     summary: "FDA、EMA、NMPA 等来源的高优先级更新会优先展示在这里。",
     meta: "按国家 / 机构 / 领域追踪",
   },
+  hotCluster: [],
   featuredCards: [
     {
       slug: "fda-ai-guidance",
@@ -196,136 +234,110 @@ const demoHomepage: HomepageData = {
       accent: "amber",
     },
   ],
-  officialSources: [
+  accountCards: [
     {
       slug: "fda",
       href: "/sources/fda",
       label: "美国 FDA",
       note: "官方监管机构",
+      summary: "聚焦美国官方指南、公告与 AI 监管更新。",
       badge: "RSS",
+      targetType: "SOURCE",
+      recentCountLabel: "12 条更新",
+    },
+    {
+      slug: "us",
+      href: "/countries/us",
+      label: "美国",
+      note: "FDA 追踪",
+      summary: "从辖区视角跟踪美国审评、eCTD 与临床政策变化。",
+      badge: "北美",
+      targetType: "COUNTRY",
+      recentCountLabel: "8 条更新",
     },
     {
       slug: "ema",
       href: "/sources/ema",
       label: "欧盟 EMA",
       note: "官方监管机构",
+      summary: "聚焦欧洲监管协调、CMC 和上市后管理更新。",
       badge: "RSS",
-    },
-    {
-      slug: "nmpa",
-      href: "/sources/nmpa",
-      label: "中国 NMPA",
-      note: "官方监管机构",
-      badge: "官方",
-    },
-    {
-      slug: "mhra",
-      href: "/sources/mhra",
-      label: "英国 MHRA",
-      note: "官方监管机构",
-      badge: "RSS",
-    },
-    {
-      slug: "pmda",
-      href: "/sources/pmda",
-      label: "日本 PMDA",
-      note: "官方监管机构",
-      badge: "RSS",
-    },
-    {
-      slug: "health-canada",
-      href: "/sources/health-canada",
-      label: "加拿大 Health Canada",
-      note: "官方监管机构",
-      badge: "ATOM",
-    },
-  ],
-  topicCards: [
-    {
-      slug: "digital-ai-regulation",
-      href: "/topics/digital-ai-regulation",
-      label: "数字化与 AI 监管",
-      note: "高关注订阅",
-      badge: "9",
-    },
-    {
-      slug: "clinical-trials",
-      href: "/topics/clinical-trials",
-      label: "临床试验",
-      note: "高价值订阅",
-      badge: "12",
-    },
-    {
-      slug: "cmc-and-manufacturing",
-      href: "/topics/cmc-and-manufacturing",
-      label: "CMC 与生产",
-      note: "热门订阅",
-      badge: "8",
-    },
-    {
-      slug: "pharmacovigilance",
-      href: "/topics/pharmacovigilance",
-      label: "药物警戒",
-      note: "持续更新",
-      badge: "6",
-    },
-    {
-      slug: "registration-submission",
-      href: "/topics/registration-submission",
-      label: "注册申报",
-      note: "资料递交",
-      badge: "10",
-    },
-    {
-      slug: "international-guidance",
-      href: "/topics/international-guidance",
-      label: "国际协调与指南",
-      note: "跨区域对齐",
-      badge: "5",
-    },
-  ],
-  countryCards: [
-    {
-      slug: "us",
-      href: "/countries/us",
-      label: "美国",
-      note: "FDA 追踪",
-      badge: "北美",
+      targetType: "SOURCE",
+      recentCountLabel: "7 条更新",
     },
     {
       slug: "eu",
       href: "/countries/eu",
       label: "欧盟",
       note: "EMA 追踪",
+      summary: "从区域视角查看 EMA 与成员国监管协调动态。",
       badge: "欧洲",
+      targetType: "COUNTRY",
+      recentCountLabel: "6 条更新",
     },
     {
-      slug: "cn",
-      href: "/countries/cn",
-      label: "中国",
-      note: "NMPA 追踪",
-      badge: "亚太",
+      slug: "nmpa",
+      href: "/sources/nmpa",
+      label: "中国 NMPA",
+      note: "官方监管机构",
+      summary: "查看中国官方征求意见、说明书与注册申报更新。",
+      badge: "官方",
+      targetType: "SOURCE",
+      recentCountLabel: "5 条更新",
+    },
+  ],
+  topicGroups: [
+    {
+      slug: "digital-ai-regulation",
+      label: "AI 医药",
+      description: "覆盖 AI 辅助审评、数据治理与数字工具。",
+      children: createSubtopicCards(
+        [
+          ["AI 医药研发", "算法 / 靶点 / 研发工具"],
+          ["AI 医药临床", "试验设计 / 受试者 / 证据"],
+          ["AI 医药投资", "项目评估 / 商业化 / 风险"],
+        ],
+        "digital-ai-regulation",
+      ),
     },
     {
-      slug: "uk",
-      href: "/countries/uk",
-      label: "英国",
-      note: "MHRA 追踪",
-      badge: "欧洲",
+      slug: "registration-submission",
+      label: "医药注册",
+      description: "聚焦路径选择、资料格式与递交策略。",
+      children: createSubtopicCards(
+        [
+          ["eCTD 结构", "模块 / 生命周期 / 验证"],
+          ["补充资料", "问询回复 / 资料补交"],
+          ["注册路径", "优先审评 / 特殊通道"],
+        ],
+        "registration-submission",
+      ),
     },
     {
-      slug: "jp",
-      href: "/countries/jp",
-      label: "日本",
-      note: "PMDA 追踪",
-      badge: "亚太",
+      slug: "clinical-trials",
+      label: "临床试验",
+      description: "覆盖去中心化临床、RWE 与执行质量。",
+      children: createSubtopicCards(
+        [
+          ["去中心化临床", "远程访视 / 电子知情"],
+          ["真实世界证据", "RWE / 外部对照"],
+          ["临床运营", "监查 / 稽查 / 数据质量"],
+        ],
+        "clinical-trials",
+      ),
     },
     {
-      slug: "ca",
-      href: "/countries/ca",
-      label: "加拿大",
-      note: "Health Canada 追踪",
-      badge: "北美",
+      slug: "cmc-and-manufacturing",
+      label: "CMC 与生产",
+      description: "聚焦工艺、稳定性与质量一致性。",
+      children: createSubtopicCards(
+        [
+          ["稳定性", "货架期 / 方案 / 条件"],
+          ["杂质控制", "限度 / 监测 / 风险"],
+          ["工艺验证", "验证策略 / 放行 / 变更"],
+        ],
+        "cmc-and-manufacturing",
+      ),
     },
   ],
   discussions: [
@@ -363,29 +375,6 @@ const demoHomepage: HomepageData = {
       updatedAtLabel: "5 小时前",
     },
   ],
-  trending: [
-    {
-      slug: "trending-fda",
-      href: "/countries/us",
-      label: "美国 FDA",
-      note: "12 条更新",
-      badge: "热点",
-    },
-    {
-      slug: "trending-ai",
-      href: "/topics/digital-ai-regulation",
-      label: "数字化与 AI 监管",
-      note: "9 个关注",
-      badge: "升温",
-    },
-    {
-      slug: "trending-ema",
-      href: "/countries/eu",
-      label: "欧盟 EMA",
-      note: "7 条更新",
-      badge: "稳定",
-    },
-  ],
 };
 
 export async function getHomepageData(): Promise<HomepageData> {
@@ -396,40 +385,83 @@ export async function getHomepageData(): Promise<HomepageData> {
     ]);
 
     if (contentItems.length === 0 && discussions.length === 0) {
-      return demoHomepage;
+      return {
+        ...demoHomepage,
+        hotCluster: buildHomepageHotCluster([], []),
+        featuredCards: buildHomepageFeaturedCards([]),
+      };
     }
 
     return {
       ...demoHomepage,
-      featuredCards:
-        contentItems.length > 0
-          ? contentItems.slice(0, 3).map(mapContentToCard)
-          : demoHomepage.featuredCards,
+      accountCards: buildAccountCards(),
+      topicGroups: buildTopicGroups(),
+      hotCluster: buildHomepageHotCluster(contentItems, discussions),
+      featuredCards: buildHomepageFeaturedCards(contentItems),
       discussions:
         discussions.length > 0
           ? discussions.slice(0, 3).map(mapDiscussionToDigest)
           : demoHomepage.discussions,
     };
   } catch {
-    return demoHomepage;
+    return {
+      ...demoHomepage,
+      hotCluster: buildHomepageHotCluster([], []),
+      featuredCards: buildHomepageFeaturedCards([]),
+    };
   }
 }
 
 export async function getFeedPageData(filters: FeedFilters = {}): Promise<FeedPageData> {
+  const activeTab = filters.tab ?? "all";
+
   try {
-    const filtered = await loadFilteredContentItems(filters);
+    const [filtered, discussions] = await Promise.all([
+      loadFilteredContentItems(filters),
+      loadDiscussionDigestsWithFallback(),
+    ]);
+    const accountResults = buildAccountSearchResults(filters.query);
+    const topicResults = buildTopicSearchResults(filters.query);
+    const discussionResults = buildDiscussionSearchResults(discussions, filters.query);
 
     return {
+      query: filters.query?.trim() ?? "",
+      activeTab,
       items: filtered.map(mapContentToCard),
+      accountResults,
+      topicResults,
+      discussionResults,
       total: filtered.length,
-      filters: demoFeedFilters,
+      tabCounts: {
+        all: filtered.length + accountResults.length + topicResults.length + discussionResults.length,
+        intelligence: filtered.length,
+        accounts: accountResults.length,
+        topics: topicResults.length,
+        discussions: discussionResults.length,
+      },
+      filters: buildFeedFilters(filters),
     };
   } catch {
     const filtered = filterContentItems(demoContentItems, filters);
+    const discussionResults = buildDiscussionSearchResults(demoHomepage.discussions, filters.query);
+    const accountResults = buildAccountSearchResults(filters.query);
+    const topicResults = buildTopicSearchResults(filters.query);
     return {
+      query: filters.query?.trim() ?? "",
+      activeTab,
       items: filtered.map(mapContentToCard),
+      accountResults,
+      topicResults,
+      discussionResults,
       total: filtered.length,
-      filters: demoFeedFilters,
+      tabCounts: {
+        all: filtered.length + accountResults.length + topicResults.length + discussionResults.length,
+        intelligence: filtered.length,
+        accounts: accountResults.length,
+        topics: topicResults.length,
+        discussions: discussionResults.length,
+      },
+      filters: buildFeedFilters(filters),
     };
   }
 }
@@ -444,7 +476,7 @@ export async function getTopicDirectoryData(): Promise<TopicDirectoryData> {
     return {
       title: "领域订阅",
       summary: "按大领域和小领域订阅全球医药监管动态。",
-      cards: topicCatalog,
+      topicGroups: buildTopicGroups(),
       latestContent: contentItems.slice(0, 4).map(mapContentToCard),
       relatedDiscussions: discussions.slice(0, 3),
     };
@@ -452,7 +484,7 @@ export async function getTopicDirectoryData(): Promise<TopicDirectoryData> {
     return {
       title: "领域订阅",
       summary: "按大领域和小领域订阅全球医药监管动态。",
-      cards: topicCatalog,
+      topicGroups: buildTopicGroups(),
       latestContent: demoContentItems.slice(0, 4).map(mapContentToCard),
       relatedDiscussions: demoHomepage.discussions,
     };
@@ -604,9 +636,9 @@ const demoFeedFilters = {
   ],
   contentTypes: [
     { slug: "all-types", href: "/feed", label: "全部类型", note: "默认", badge: "" },
-    { slug: "policy", href: "/feed?contentType=POLICY", label: "政策", note: "官方", badge: "P" },
-    { slug: "guidance", href: "/feed?contentType=GUIDANCE", label: "指南", note: "官方", badge: "G" },
-    { slug: "news", href: "/feed?contentType=NEWS", label: "新闻", note: "解读", badge: "N" },
+    { slug: "POLICY", href: "/feed?contentType=POLICY", label: "政策", note: "官方", badge: "P" },
+    { slug: "GUIDANCE", href: "/feed?contentType=GUIDANCE", label: "指南", note: "官方", badge: "G" },
+    { slug: "NEWS", href: "/feed?contentType=NEWS", label: "新闻", note: "解读", badge: "N" },
   ],
   timeRanges: [
     { slug: "all-time", href: "/feed", label: "全部时间", note: "默认", badge: "" },
@@ -785,6 +817,134 @@ const countryCatalog: CatalogCardData[] = [
   },
 ];
 
+function buildAccountCards(): AccountCardData[] {
+  return [
+    ...sourceCatalog.slice(0, 3).map((item, index) => ({
+      slug: item.slug,
+      href: item.href,
+      label: item.label,
+      note: item.note,
+      summary: item.summary,
+      badge: item.badge,
+      targetType: "SOURCE" as const,
+      recentCountLabel: `${12 - index * 2} 条更新`,
+    })),
+    ...countryCatalog.slice(0, 3).map((item, index) => ({
+      slug: item.slug,
+      href: item.href,
+      label: item.label,
+      note: item.note,
+      summary: item.summary,
+      badge: item.badge,
+      targetType: "COUNTRY" as const,
+      recentCountLabel: `${8 - index} 条更新`,
+    })),
+  ];
+}
+
+function buildTopicGroups(): TopicGroupData[] {
+  return topLevelTopics.map((topic) => {
+    const summary = topicCatalog.find((item) => item.slug === topic.slug)?.summary ?? `${topic.name} 相关主题入口。`;
+
+    return {
+      slug: topic.slug,
+      label: topic.name,
+      description: summary,
+      children: buildTopicSubtopics(topic.slug),
+    };
+  });
+}
+
+function buildHomepageFeaturedCards(contentItems: DbContentItem[]) {
+  const sourceItems =
+    contentItems.length >= 30
+      ? contentItems
+      : [...contentItems, ...demoContentItems.filter((item) => !contentItems.some((record) => record.slug === item.slug))];
+  const cards = sourceItems.map(mapContentToCard);
+
+  if (cards.length >= 30) {
+    return cards.slice(0, 30);
+  }
+
+  const extended: IntelligenceCardData[] = [...cards];
+  let cursor = 0;
+
+  while (extended.length < 30 && cards.length > 0) {
+    const seed = cards[cursor % cards.length];
+    extended.push({
+      ...seed,
+      slug: `${seed.slug}-extended-${extended.length + 1}`,
+    });
+    cursor += 1;
+  }
+
+  return extended;
+}
+
+type HomepageDiscussionRecord = Awaited<ReturnType<typeof loadDiscussionDigests>>[number];
+
+function buildHomepageHotCluster(contentItems: DbContentItem[], discussions: HomepageDiscussionRecord[]): HotClusterItemData[] {
+  const sourceContent =
+    contentItems.length > 0
+      ? contentItems
+      : [...demoContentItems];
+  const sourceDiscussions = discussions.length > 0 ? discussions : [];
+
+  const contentCandidates = sourceContent.slice(0, 10).map((item) => {
+    const hoursAgo = Math.max(1, Math.floor((Date.now() - item.publishedAt.getTime()) / (1000 * 60 * 60)));
+    const freshnessScore = Math.max(18, 96 - hoursAgo);
+    const typeScore = item.contentType === "ALERT" ? 16 : item.contentType === "GUIDANCE" ? 12 : 9;
+    const score = freshnessScore + typeScore;
+
+    return {
+      score,
+      href: `/content/${item.slug}`,
+      title: item.title,
+      kind: "intelligence" as const,
+      kindLabel: "情报",
+      meta: `${item.source?.name ?? "未知来源"} · ${formatTimeAgo(item.publishedAt)}`,
+      heatLabel: `热度 ${score}`,
+    };
+  });
+
+  const discussionCandidates = sourceDiscussions.map((item) => {
+    const totalViews = item.views.reduce((total, view) => total + view.viewCount, 0);
+    const score = totalViews * 8 + item.answers.length * 11 + item.evidence.length * 7;
+
+    return {
+      score,
+      href: `/discussions/${item.slug}`,
+      title: item.title,
+      kind: "discussion" as const,
+      kindLabel: "问答",
+      meta: `${item.answers.length} 条回答 · ${item.evidence.length} 条证据 · ${formatTimeAgo(item.updatedAt)}`,
+      heatLabel: `热度 ${Math.max(score, 18)}`,
+    };
+  });
+
+  const combined = [...contentCandidates, ...discussionCandidates]
+    .sort((left, right) => right.score - left.score)
+    .slice(0, 10);
+
+  if (combined.length >= 10) {
+    return combined.map((item, index) => ({ ...item, rank: index + 1 }));
+  }
+
+  const fallbackDiscussions = demoHomepage.discussions.map((item, index) => ({
+    score: 60 - index * 3,
+    href: item.href,
+    title: item.title,
+    kind: "discussion" as const,
+    kindLabel: "问答",
+    meta: `${item.answerCount} 条回答 · ${item.evidenceCount} 条证据 · ${item.updatedAtLabel}`,
+    heatLabel: `热度 ${60 - index * 3}`,
+  }));
+
+  return [...combined, ...fallbackDiscussions]
+    .slice(0, 10)
+    .map((item, index) => ({ ...item, rank: index + 1 }));
+}
+
 const demoContentItems: DbContentItem[] = [
   createDemoContentItem({
     id: "demo-1",
@@ -882,6 +1042,90 @@ const demoContentItems: DbContentItem[] = [
     country: { id: "eu", slug: "eu", name: "欧盟" },
     topic: { id: "post-marketing", slug: "post-marketing", name: "上市后管理" },
   }),
+  createDemoContentItem({
+    id: "demo-9",
+    slug: "fda-patient-diversity-guidance",
+    title: "FDA 更新患者多样性指导原则问答",
+    summary: "纳入标准、代表性样本和早期试验设计被放到更核心的位置。",
+    canonicalUrl: "https://www.fda.gov/demo/patient-diversity-guidance",
+    contentType: "GUIDANCE",
+    publishedHoursAgo: 92,
+    source: { id: "fda", slug: "fda", name: "美国 FDA", countryId: "us" },
+    country: { id: "us", slug: "us", name: "美国" },
+    topic: { id: "clinical-trials", slug: "clinical-trials", name: "临床试验" },
+  }),
+  createDemoContentItem({
+    id: "demo-10",
+    slug: "ema-ai-ctd-note",
+    title: "EMA 提醒 AI 生成文档需保留可审计链路",
+    summary: "数字化撰写和自动摘要工具的来源留痕成为关注重点。",
+    canonicalUrl: "https://www.ema.europa.eu/demo/ai-ctd-note",
+    contentType: "POLICY",
+    publishedHoursAgo: 104,
+    source: { id: "ema", slug: "ema", name: "欧盟 EMA", countryId: "eu" },
+    country: { id: "eu", slug: "eu", name: "欧盟" },
+    topic: { id: "digital-ai-regulation", slug: "digital-ai-regulation", name: "数字化与 AI 监管" },
+  }),
+  createDemoContentItem({
+    id: "demo-11",
+    slug: "nmpa-ectd-format-qa",
+    title: "NMPA 发布 eCTD 递交格式常见问题更新",
+    summary: "模块命名、版本覆盖和信封字段校验要求更明确。",
+    canonicalUrl: "https://www.nmpa.gov.cn/demo/ectd-format-qa",
+    contentType: "GUIDANCE",
+    publishedHoursAgo: 116,
+    source: { id: "nmpa", slug: "nmpa", name: "中国 NMPA", countryId: "cn" },
+    country: { id: "cn", slug: "cn", name: "中国" },
+    topic: { id: "registration-submission", slug: "registration-submission", name: "注册申报" },
+  }),
+  createDemoContentItem({
+    id: "demo-12",
+    slug: "mhra-labeling-risk-update",
+    title: "MHRA 调整风险提示文案的审查重点",
+    summary: "说明书中风险分层、重点警示与患者沟通要求被同步强化。",
+    canonicalUrl: "https://www.gov.uk/demo/labeling-risk-update",
+    contentType: "POLICY",
+    publishedHoursAgo: 128,
+    source: { id: "mhra", slug: "mhra", name: "英国 MHRA", countryId: "uk" },
+    country: { id: "uk", slug: "uk", name: "英国" },
+    topic: { id: "labeling-and-insert", slug: "labeling-and-insert", name: "标签与说明书" },
+  }),
+  createDemoContentItem({
+    id: "demo-13",
+    slug: "pmda-post-market-risk-note",
+    title: "PMDA 重申上市后风险最小化材料的一致性要求",
+    summary: "上市后沟通材料与主说明书信息不一致将被重点关注。",
+    canonicalUrl: "https://www.pmda.go.jp/demo/post-market-risk-note",
+    contentType: "NEWS",
+    publishedHoursAgo: 140,
+    source: { id: "pmda", slug: "pmda", name: "日本 PMDA", countryId: "jp" },
+    country: { id: "jp", slug: "jp", name: "日本" },
+    topic: { id: "post-marketing", slug: "post-marketing", name: "上市后管理" },
+  }),
+  createDemoContentItem({
+    id: "demo-14",
+    slug: "health-canada-signal-reporting-update",
+    title: "Health Canada 更新信号识别后的补充报告路径",
+    summary: "药物警戒事件分级、补充时限与跟踪沟通节点更细化。",
+    canonicalUrl: "https://www.canada.ca/demo/signal-reporting-update",
+    contentType: "ALERT",
+    publishedHoursAgo: 152,
+    source: { id: "health-canada", slug: "health-canada", name: "加拿大 Health Canada", countryId: "ca" },
+    country: { id: "ca", slug: "ca", name: "加拿大" },
+    topic: { id: "pharmacovigilance", slug: "pharmacovigilance", name: "药物警戒" },
+  }),
+  createDemoContentItem({
+    id: "demo-15",
+    slug: "fda-international-guidance-brief",
+    title: "FDA 汇总近期国际协调指南对齐变化",
+    summary: "ICH 与主要监管辖区在术语和实施边界上的差异被集中提示。",
+    canonicalUrl: "https://www.fda.gov/demo/international-guidance-brief",
+    contentType: "GUIDANCE",
+    publishedHoursAgo: 164,
+    source: { id: "fda", slug: "fda", name: "美国 FDA", countryId: "us" },
+    country: { id: "us", slug: "us", name: "美国" },
+    topic: { id: "international-guidance", slug: "international-guidance", name: "国际协调与指南" },
+  }),
 ];
 
 async function loadContentItems(): Promise<DbContentItem[]> {
@@ -901,11 +1145,16 @@ async function loadContentItems(): Promise<DbContentItem[]> {
 async function loadDiscussionDigests() {
   return prisma.discussion.findMany({
     orderBy: [{ updatedAt: "desc" }],
-    take: 8,
+    take: 12,
     include: {
       conclusion: true,
       evidence: true,
       answers: true,
+      views: {
+        select: {
+          viewCount: true,
+        },
+      },
     },
   });
 }
@@ -1027,62 +1276,62 @@ function buildTopicSubtopics(slug: string): CatalogCardData[] {
         ["去中心化临床", "远程访视 / 电子化 / 分散式"],
         ["真实世界证据", "RWE / RWD / 外部对照"],
         ["临床运营", "执行 / 监查 / 质量管理"],
-      ], `/feed?topic=${encodeURIComponent(slug)}`);
+      ], slug);
     case "cmc-and-manufacturing":
       return createSubtopicCards([
         ["稳定性", "货架期 / 条件 / 方案"],
         ["杂质控制", "工艺杂质 / 限度 / 监测"],
         ["工艺验证", "验证策略 / 放行 / 变更"],
         ["连续生产", "连续制造 / 自动化 / 控制"],
-      ], `/feed?topic=${encodeURIComponent(slug)}`);
+      ], slug);
     case "registration-submission":
       return createSubtopicCards([
         ["eCTD", "结构 / 模块 / 提交"],
         ["补充资料", "问询 / 响应 / 资料补交"],
         ["审评沟通", "沟通机制 / 会议 / 路径"],
         ["申报路径", "优先审评 / 加速通道 / 适应症"],
-      ], `/feed?topic=${encodeURIComponent(slug)}`);
+      ], slug);
     case "labeling-and-insert":
       return createSubtopicCards([
         ["说明书格式", "版式 / 结构 / 更新"],
         ["适应症", "适应症描述 / 边界 / 扩展"],
         ["风险提示", "警示语 / 不良反应 / 监测"],
         ["广告宣传", "合规 / 宣传限制 / 审核"],
-      ], `/feed?topic=${encodeURIComponent(slug)}`);
+      ], slug);
     case "post-marketing":
       return createSubtopicCards([
         ["变更控制", "补充申请 / 重大变更 / 通知"],
         ["再评价", "再审查 / 再评价 / 证据更新"],
         ["上市后研究", "PMS / 真实世界 / 补充证据"],
         ["风险管理", "RMP / 缓解措施 / 信号响应"],
-      ], `/feed?topic=${encodeURIComponent(slug)}`);
+      ], slug);
     case "pharmacovigilance":
       return createSubtopicCards([
         ["信号识别", "信号检测 / 评估 / 上报"],
         ["周期报告", "PSUR / PBRER / 递交"],
         ["个例报告", "ICSR / 时限 / 质量"],
         ["风险管理", "RMP / 风险最小化 / 沟通"],
-      ], `/feed?topic=${encodeURIComponent(slug)}`);
+      ], slug);
     case "digital-ai-regulation":
       return createSubtopicCards([
         ["AI 辅助审评", "模型 / 评估 / 审评关注"],
         ["数据治理", "数据可追溯 / 留痕 / 权限"],
         ["模型验证", "验证 / 偏差 / 稳定性"],
         ["数字工具", "软件 / 平台 / 数字化工具"],
-      ], `/feed?topic=${encodeURIComponent(slug)}`);
+      ], slug);
     case "international-guidance":
       return createSubtopicCards([
         ["ICH", "国际协调 / 指南 / 共识"],
         ["FDA / EMA", "跨区域对齐 / 监管口径"],
         ["MHRA / PMDA", "区域经验 / 执行差异"],
         ["指南解读", "二手解读 / 影响分析"],
-      ], `/feed?topic=${encodeURIComponent(slug)}`);
+      ], slug);
     default:
       return createSubtopicCards([
         [slugToLabel(slug, "领域"), "默认子领域"],
         ["最新更新", "按时间追踪"],
         ["相关讨论", "社区问答"],
-      ], `/feed?topic=${encodeURIComponent(slug)}`);
+      ], slug);
   }
 }
 
@@ -1114,10 +1363,10 @@ function mapContentToDetail(item: DbContentItem): ContentDetailData {
   };
 }
 
-function createSubtopicCards(items: Array<[string, string]>, href: string): CatalogCardData[] {
+function createSubtopicCards(items: Array<[string, string]>, topicSlug: string): CatalogCardData[] {
   return items.map(([label, summary], index) => ({
     slug: `${label}-${index}`,
-    href,
+    href: buildFeedHref({ tab: "intelligence", topic: topicSlug, query: label }),
     label,
     note: "小领域",
     badge: `${index + 1}`,
@@ -1178,6 +1427,105 @@ function slugToLabel(slug: string, fallbackLabel: string) {
     .join(" ")
     .replace(/\bAi\b/g, "AI")
     .replace(/\bCmc\b/g, "CMC") || fallbackLabel;
+}
+
+function buildFeedFilters(filters: FeedFilters) {
+  return {
+    countries: buildFeedFilterGroup("country", demoFeedFilters.countries, filters),
+    sources: buildFeedFilterGroup("source", demoFeedFilters.sources, filters),
+    topics: buildFeedFilterGroup("topic", demoFeedFilters.topics, filters),
+    contentTypes: buildFeedFilterGroup("contentType", demoFeedFilters.contentTypes, filters),
+    timeRanges: buildFeedFilterGroup("timeRange", demoFeedFilters.timeRanges, filters),
+  };
+}
+
+function buildFeedFilterGroup(
+  key: keyof Pick<FeedFilters, "country" | "source" | "topic" | "contentType" | "timeRange">,
+  items: SmallCardData[],
+  filters: FeedFilters,
+) {
+  return items.map((item) => ({
+    ...item,
+    href: buildFeedHref(filters, {
+      [key]: item.slug.startsWith("all-") ? undefined : item.slug,
+    }),
+  }));
+}
+
+function buildFeedHref(filters: FeedFilters, overrides: Partial<FeedFilters> = {}) {
+  const next: FeedFilters = { ...filters, ...overrides };
+  const params = new URLSearchParams();
+
+  if (next.query) {
+    params.set("query", next.query);
+  }
+
+  if (next.tab && next.tab !== "all") {
+    params.set("tab", next.tab);
+  }
+
+  if (next.country) {
+    params.set("country", next.country);
+  }
+
+  if (next.source) {
+    params.set("source", next.source);
+  }
+
+  if (next.topic) {
+    params.set("topic", next.topic);
+  }
+
+  if (next.contentType) {
+    params.set("contentType", next.contentType);
+  }
+
+  if (next.timeRange) {
+    params.set("timeRange", next.timeRange);
+  }
+
+  const query = params.toString();
+  return query ? `/feed?${query}` : "/feed";
+}
+
+function buildAccountSearchResults(query?: string): AccountCardData[] {
+  const normalized = query?.trim().toLowerCase();
+  const items = buildAccountCards();
+
+  if (!normalized) {
+    return items.slice(0, 6);
+  }
+
+  return items.filter((item) => {
+    const haystack = `${item.label} ${item.note} ${item.summary}`.toLowerCase();
+    return haystack.includes(normalized);
+  });
+}
+
+function buildTopicSearchResults(query?: string): CatalogCardData[] {
+  const normalized = query?.trim().toLowerCase();
+
+  if (!normalized) {
+    return topicCatalog.slice(0, 6);
+  }
+
+  return topicCatalog.filter((item) => {
+    const haystack = `${item.label} ${item.note} ${item.summary}`.toLowerCase();
+    return haystack.includes(normalized);
+  });
+}
+
+function buildDiscussionSearchResults(discussions: DiscussionDigestData[], query?: string) {
+  const normalized = query?.trim().toLowerCase();
+
+  if (!normalized) {
+    return discussions.slice(0, 4);
+  }
+
+  return discussions.filter((item) => {
+    const haystack = `${item.title} ${item.summary} ${item.conclusion}`.toLowerCase();
+    return haystack.includes(normalized);
+  });
 }
 
 function filterContentItems(items: DbContentItem[], filters: FeedFilters) {
@@ -1259,21 +1607,24 @@ function matchesTimeRange(date: Date, range: string) {
 }
 
 function formatTimeAgo(date: Date) {
-  const diffHours = Math.max(0, Math.round((Date.now() - date.getTime()) / (1000 * 60 * 60)));
+  const diffMs = Math.max(0, Date.now() - date.getTime());
+  const diffMinutes = Math.max(1, Math.floor(diffMs / (1000 * 60)));
 
-  if (diffHours < 1) {
-    return "刚刚";
+  if (diffMinutes < 60) {
+    return `${diffMinutes} 分钟前`;
   }
 
-  if (diffHours < 24) {
+  const diffHours = Math.floor(diffMinutes / 60);
+
+  if (diffHours < 48) {
     return `${diffHours} 小时前`;
   }
 
-  const days = Math.max(1, Math.round(diffHours / 24));
-
-  if (days === 1) {
-    return "昨日";
-  }
-
-  return `${days} 天前`;
+  return new Intl.DateTimeFormat("zh-CN", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
 }

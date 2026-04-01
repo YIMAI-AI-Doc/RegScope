@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/content/queries", () => ({
   getFeedPageData: vi.fn().mockResolvedValue({
+    query: "AI",
+    activeTab: "intelligence",
     items: [
       {
         slug: "feed-1",
@@ -18,7 +20,17 @@ vi.mock("@/lib/content/queries", () => ({
         accent: "teal",
       },
     ],
+    accountResults: [],
+    topicResults: [],
+    discussionResults: [],
     total: 1,
+    tabCounts: {
+      all: 1,
+      intelligence: 1,
+      accounts: 0,
+      topics: 0,
+      discussions: 0,
+    },
     filters: {
       countries: [
         { slug: "all-countries", href: "/feed", label: "全部国家", note: "默认", badge: "" },
@@ -42,11 +54,13 @@ vi.mock("@/lib/content/queries", () => ({
 import FeedPage from "./page";
 
 describe("FeedPage", () => {
-  it("renders the feed filters and intelligence cards", async () => {
-    render(await FeedPage({ searchParams: { topic: "digital-ai-regulation" } }));
+  it("renders the search result header, drawer trigger, and intelligence cards", async () => {
+    render(await FeedPage({ searchParams: { topic: "digital-ai-regulation", tab: "intelligence", query: "AI" } }));
 
-    expect(screen.getByText("筛选情报")).toBeInTheDocument();
+    expect(screen.getByText("搜索结果")).toBeInTheDocument();
+    expect(screen.getByText("情报")).toBeInTheDocument();
+    expect(screen.getByText("更多筛选")).toBeInTheDocument();
     expect(screen.getByText("测试快讯")).toBeInTheDocument();
-    expect(screen.getByText("结果")).toBeInTheDocument();
+    expect(screen.getByText("情报结果")).toBeInTheDocument();
   });
 });

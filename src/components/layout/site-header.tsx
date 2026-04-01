@@ -41,16 +41,16 @@ export async function SiteHeader() {
 
   return (
     <header className="topbar">
-      <Link href="/" className="brand" style={{ textDecoration: "none", color: "inherit" }}>
-        <span className="brand-mark" aria-hidden="true">R</span>
+      <div className="brand">
+        <span className="brand-mark">R</span>
         <div>
-          <p className="brand-name">药云纵观</p>
-          <p className="brand-tag">RegScope</p>
+          <p className="brand-name">RegScope</p>
+          <p className="brand-tag">全球医药监管情报平台</p>
         </div>
-      </Link>
+      </div>
       <div className="cluster-banner" aria-label="全球医药法规情报平台">
-        <strong>全球医药法规情报平台</strong>
         <span className="cluster-banner-kicker">Global Pharma Regulatory Intelligence Platform</span>
+        <strong>全球医药法规情报平台</strong>
       </div>
       <nav className="topnav" aria-label="主导航">
         <TopnavLinks items={navItems} />
@@ -60,6 +60,7 @@ export async function SiteHeader() {
             name: viewer.name,
             email: viewer.email,
             role: viewer.role,
+            avatarUrl: viewer.avatarUrl,
           }}
           stats={{
             followCount: stats[0],

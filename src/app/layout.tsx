@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { NextDevtoolsLocalizer } from "@/components/devtools/next-devtools-localizer";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import "./globals.css";
@@ -18,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body>
+        <NextDevtoolsLocalizer />
         <div className="app-shell">
           <SiteHeader />
           <main className="app-main">{children}</main>

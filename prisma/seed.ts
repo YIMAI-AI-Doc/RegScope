@@ -104,6 +104,29 @@ const userSeeds = [
   { email: "label@regscope.local", name: "Labeling Lead" },
 ] as const;
 
+const followSeeds = [
+  {
+    userEmail: "demo@regscope.local",
+    targetType: "TOPIC" as const,
+    topicSlug: "digital-ai-regulation",
+  },
+  {
+    userEmail: "demo@regscope.local",
+    targetType: "TOPIC" as const,
+    topicSlug: "cmc-and-manufacturing",
+  },
+  {
+    userEmail: "demo@regscope.local",
+    targetType: "COUNTRY" as const,
+    countrySlug: "us",
+  },
+  {
+    userEmail: "demo@regscope.local",
+    targetType: "COUNTRY" as const,
+    countrySlug: "eu",
+  },
+] as const;
+
 type DiscussionSeed = {
   slug: string;
   title: string;
@@ -128,6 +151,14 @@ type DiscussionSeed = {
     body: string;
     evidenceLabel: EvidenceLabel;
     isAccepted: boolean;
+    votes?: Array<{
+      userEmail: string;
+      value: -1 | 1;
+    }>;
+  }>;
+  views?: Array<{
+    userEmail: string;
+    viewCount: number;
   }>;
 };
 
@@ -365,13 +396,26 @@ const discussionSeeds: DiscussionSeed[] = [
         body: "更偏向文档、验证和可追溯性的要求升级，暂时不建议理解成申报路径完全重构。",
         evidenceLabel: EvidenceLabel.OFFICIAL,
         isAccepted: true,
+        votes: [
+          { userEmail: "demo@regscope.local", value: 1 },
+          { userEmail: "cmc@regscope.local", value: 1 },
+          { userEmail: "pv@regscope.local", value: 1 },
+        ],
       },
       {
         authorEmail: "demo@regscope.local",
         body: "如果团队已经有模型验证与变更控制框架，当前更应该补治理证据而不是大改提交路径。",
         evidenceLabel: EvidenceLabel.EXPERIENCE,
         isAccepted: false,
+        votes: [
+          { userEmail: "analyst@regscope.local", value: 1 },
+          { userEmail: "label@regscope.local", value: 1 },
+        ],
       },
+    ],
+    views: [
+      { userEmail: "demo@regscope.local", viewCount: 6 },
+      { userEmail: "analyst@regscope.local", viewCount: 4 },
     ],
   },
   {
@@ -412,13 +456,23 @@ const discussionSeeds: DiscussionSeed[] = [
         body: "先看变更是否影响关键质量属性，如果影响边界清晰，再决定是否补充稳定性数据。",
         evidenceLabel: EvidenceLabel.ANALYSIS,
         isAccepted: true,
+        votes: [
+          { userEmail: "demo@regscope.local", value: 1 },
+          { userEmail: "analyst@regscope.local", value: 1 },
+          { userEmail: "pv@regscope.local", value: 1 },
+        ],
       },
       {
         authorEmail: "demo@regscope.local",
         body: "如果只看单一区域经验，很容易把补充稳定性数据做成默认动作，反而增加不必要负担。",
         evidenceLabel: EvidenceLabel.EXPERIENCE,
         isAccepted: false,
+        votes: [{ userEmail: "cmc@regscope.local", value: 1 }],
       },
+    ],
+    views: [
+      { userEmail: "demo@regscope.local", viewCount: 5 },
+      { userEmail: "cmc@regscope.local", viewCount: 3 },
     ],
   },
   {
@@ -454,14 +508,20 @@ const discussionSeeds: DiscussionSeed[] = [
         body: "建议把受试者理解确认方式和异常升级路径写得比传统中心化试验更细。",
         evidenceLabel: EvidenceLabel.OFFICIAL,
         isAccepted: true,
+        votes: [
+          { userEmail: "demo@regscope.local", value: 1 },
+          { userEmail: "label@regscope.local", value: 1 },
+        ],
       },
       {
         authorEmail: "label@regscope.local",
         body: "如果知情材料在不同终端呈现不一致，后续审计追踪很容易变成争议点。",
         evidenceLabel: EvidenceLabel.EXPERIENCE,
         isAccepted: false,
+        votes: [{ userEmail: "analyst@regscope.local", value: 1 }],
       },
     ],
+    views: [{ userEmail: "demo@regscope.local", viewCount: 2 }],
   },
   {
     slug: "signal-detection-ai-triage",
@@ -501,14 +561,20 @@ const discussionSeeds: DiscussionSeed[] = [
         body: "AI 更适合帮助缩小信号池，而不是替代人工医学判断与最终上报决策。",
         evidenceLabel: EvidenceLabel.OFFICIAL,
         isAccepted: true,
+        votes: [
+          { userEmail: "demo@regscope.local", value: 1 },
+          { userEmail: "analyst@regscope.local", value: 1 },
+        ],
       },
       {
         authorEmail: "analyst@regscope.local",
         body: "如果没有阈值管理和误报复盘机制，AI 初筛很难在审计里站住脚。",
         evidenceLabel: EvidenceLabel.ANALYSIS,
         isAccepted: false,
+        votes: [{ userEmail: "pv@regscope.local", value: 1 }],
       },
     ],
+    views: [{ userEmail: "demo@regscope.local", viewCount: 1 }],
   },
   {
     slug: "labeling-digital-supplement",
@@ -543,14 +609,20 @@ const discussionSeeds: DiscussionSeed[] = [
         body: "二维码和数字化补充信息更适合承载解释性材料，但主说明书的法定义务短期内仍不会消失。",
         evidenceLabel: EvidenceLabel.OFFICIAL,
         isAccepted: true,
+        votes: [
+          { userEmail: "demo@regscope.local", value: 1 },
+          { userEmail: "analyst@regscope.local", value: 1 },
+        ],
       },
       {
         authorEmail: "demo@regscope.local",
         body: "如果数字化内容版本控制做不好，反而会放大标签更新后的合规风险。",
         evidenceLabel: EvidenceLabel.EXPERIENCE,
         isAccepted: false,
+        votes: [{ userEmail: "label@regscope.local", value: 1 }],
       },
     ],
+    views: [{ userEmail: "demo@regscope.local", viewCount: 3 }],
   },
 ];
 
@@ -647,6 +719,33 @@ async function main() {
   );
   const userMap = new Map(userRecords.map((user) => [user.email, user]));
 
+  for (const follow of followSeeds) {
+    const userId = userMap.get(follow.userEmail)?.id ?? "";
+    const countryId = "countrySlug" in follow ? countryMap.get(follow.countrySlug)?.id ?? null : null;
+    const topicId = "topicSlug" in follow ? topicMap.get(follow.topicSlug)?.id ?? null : null;
+    const existingFollow = await prisma.follow.findFirst({
+      where: {
+        userId,
+        targetType: follow.targetType,
+        countryId,
+        sourceId: null,
+        topicId,
+      },
+      select: { id: true },
+    });
+
+    if (!existingFollow) {
+      await prisma.follow.create({
+        data: {
+          userId,
+          targetType: follow.targetType,
+          countryId,
+          topicId,
+        },
+      });
+    }
+  }
+
   for (const item of contentSeeds) {
     await prisma.contentItem.upsert({
       where: { canonicalUrl: item.canonicalUrl },
@@ -739,7 +838,7 @@ async function main() {
     for (const answer of discussion.answers) {
       const authorId = userMap.get(answer.authorEmail)?.id;
 
-      await prisma.answer.upsert({
+      const answerRecord = await prisma.answer.upsert({
         where: {
           discussionId_authorId_body: {
             discussionId: discussionRecord.id,
@@ -757,6 +856,44 @@ async function main() {
           body: answer.body,
           evidenceLabel: answer.evidenceLabel,
           isAccepted: answer.isAccepted,
+        },
+      });
+
+      for (const vote of answer.votes ?? []) {
+        await prisma.answerVote.upsert({
+          where: {
+            answerId_userId: {
+              answerId: answerRecord.id,
+              userId: userMap.get(vote.userEmail)?.id ?? "",
+            },
+          },
+          update: {
+            value: vote.value,
+          },
+          create: {
+            answerId: answerRecord.id,
+            userId: userMap.get(vote.userEmail)?.id ?? "",
+            value: vote.value,
+          },
+        });
+      }
+    }
+
+    for (const view of discussion.views ?? []) {
+      await prisma.discussionView.upsert({
+        where: {
+          userId_discussionId: {
+            userId: userMap.get(view.userEmail)?.id ?? "",
+            discussionId: discussionRecord.id,
+          },
+        },
+        update: {
+          viewCount: view.viewCount,
+        },
+        create: {
+          userId: userMap.get(view.userEmail)?.id ?? "",
+          discussionId: discussionRecord.id,
+          viewCount: view.viewCount,
         },
       });
     }
