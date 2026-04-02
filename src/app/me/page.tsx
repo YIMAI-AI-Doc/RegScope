@@ -18,14 +18,19 @@ export default async function MePage() {
     redirect("/api/auth/signin");
   }
 
-  const [stats, favorites] = await Promise.all([
+  const [profile, stats, favorites] = await Promise.all([
+    getProfileSummary(viewer.id),
     getProfileStats(viewer.id),
     getFavorites(viewer.id),
   ]);
 
   return (
     <div style={{ display: "grid", gap: "18px", padding: "24px 0" }}>
-      <ProfileAvatarCard name={viewer.name ?? viewer.email ?? ""} email={viewer.email ?? ""} avatarUrl={viewer.avatarUrl} />
+      <ProfileAvatarCard
+        name={profile.name ?? viewer.name ?? viewer.email ?? ""}
+        email={profile.email ?? viewer.email ?? ""}
+        avatarUrl={profile.avatarUrl}
+      />
 
       <section
         style={{
@@ -179,19 +184,29 @@ function FavoritesList({ favorites }: { favorites: Favorites }) {
 }
 
 async function getProfileStats(userId: string) {
-  const [user, followCount, answerCount, discussionCount] = await Promise.all([
-    prisma.user.findUnique({ where: { id: userId }, select: { avatarUrl: true, name: true } }),
+  const [followCount, answerCount, discussionCount] = await Promise.all([
     prisma.follow.count({ where: { userId } }),
     prisma.answer.count({ where: { authorId: userId } }),
     prisma.discussion.count({ where: { createdById: userId } }),
   ]);
 
   return {
-    avatarUrl: user?.avatarUrl ?? null,
-    displayName: user?.name ?? null,
     followCount,
     answerCount,
     discussionCount,
+  };
+}
+
+async function getProfileSummary(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { avatarUrl: true, name: true, email: true },
+  });
+
+  return {
+    avatarUrl: user?.avatarUrl ?? null,
+    name: user?.name ?? null,
+    email: user?.email ?? null,
   };
 }
 

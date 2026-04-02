@@ -62,10 +62,10 @@ a {
   top: 0;
   z-index: 40;
   display: grid;
-  grid-template-columns: auto minmax(320px, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 760px) minmax(0, 1fr);
   align-items: center;
   gap: 22px;
-  padding: 12px 24px;
+  padding: 24.5px 24px;
   border-bottom: 1px solid var(--border);
   background:
     radial-gradient(circle at 12% 40%, rgba(255, 221, 190, 0.42), transparent 24%),
@@ -104,6 +104,7 @@ a {
 .brand {
   display: flex;
   align-items: center;
+  justify-self: start;
   gap: 14px;
   color: inherit;
   text-decoration: none;
@@ -136,16 +137,56 @@ a {
   height: 100%;
 }
 
+.brand-copy {
+  display: grid;
+  align-content: center;
+  gap: 0;
+}
+
 .brand-name {
   margin: 0;
+  display: inline-block;
+  width: 8.4ch;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
+  line-height: 1;
+  text-align: justify;
+  text-align-last: justify;
+}
+
+.brand-name::after {
+  content: "";
+  display: inline-block;
+  width: 100%;
 }
 
 .brand-tag {
-  margin: 2px 0 0;
-  color: var(--muted);
-  font-size: 0.88rem;
+  margin: -6px 0 0;
+  display: inline-block;
+  width: 8.4ch;
+  font-size: 0.96rem;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  font-family:
+    "Avenir Next",
+    "Trebuchet MS",
+    "Segoe UI",
+    sans-serif;
+  transform: none;
+  color: #2f69ab;
+  text-shadow: none;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .brand-tag {
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    color: #2f69ab;
+    -webkit-text-fill-color: #2f69ab;
+  }
 }
 
 .brand-side-note {
@@ -154,6 +195,55 @@ a {
   font-size: 0.76rem;
   font-weight: 600;
   letter-spacing: 0.08em;
+}
+
+.topbar-search {
+  width: 100%;
+  max-width: 760px;
+  justify-self: center;
+}
+
+.site-global-search {
+  position: relative;
+  width: 100%;
+}
+
+.site-global-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  color: #6c7c96;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.site-global-search-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.site-global-search-input {
+  width: 100%;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 10px 14px 10px 40px;
+  font-size: 0.95rem;
+  color: var(--text);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+
+.site-global-search-input::placeholder {
+  color: #8f98a9;
+}
+
+.site-global-search-input:focus-visible {
+  outline: 2px solid rgba(47, 106, 168, 0.34);
+  outline-offset: 2px;
 }
 
 .topnav {
@@ -168,20 +258,26 @@ a {
 
 .topnav a {
   position: relative;
-  padding: 4px 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 6px 10px;
+  border-radius: 12px;
   font-weight: 600;
+  transition: background-color 160ms ease, color 160ms ease;
 }
 
 .topnav a.active {
   color: var(--accent);
+  background: rgba(31, 79, 134, 0.06);
 }
 
 .topnav a.active::after {
   content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -6px;
+  left: 10px;
+  right: 10px;
+  bottom: 2px;
   height: 3px;
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(31, 79, 134, 0.12), var(--accent), rgba(31, 79, 134, 0.12));
@@ -190,6 +286,7 @@ a {
 
 .topnav a:hover {
   color: var(--text);
+  background: rgba(31, 79, 134, 0.04);
 }
 
 .account-menu {
@@ -249,12 +346,8 @@ a {
   align-content: start;
 }
 
-.site-footer-logo {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: 0.01em;
-  color: var(--text);
+.site-footer-logo-link {
+  width: fit-content;
 }
 
 .site-footer-description {
@@ -262,6 +355,10 @@ a {
   color: var(--muted);
   line-height: 1.78;
   font-size: 0.92rem;
+}
+
+.site-footer-description-line {
+  display: block;
 }
 
 .site-footer-tags {
@@ -532,6 +629,10 @@ a {
     grid-template-columns: 1fr;
     justify-items: stretch;
     padding: 14px 20px;
+  }
+
+  .topbar-search {
+    max-width: none;
   }
 
   .app-main {

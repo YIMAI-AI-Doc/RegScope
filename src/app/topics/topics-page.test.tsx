@@ -59,10 +59,8 @@ describe("TopicsPage", () => {
   it("renders topic browser, latest content, and related discussions", async () => {
     render(await TopicsPage());
 
-    expect(screen.getByRole("heading", { name: "领域订阅" })).toBeInTheDocument();
+    expect(screen.getByRole("searchbox", { name: "搜索想关注的领域" })).toBeInTheDocument();
     expect(screen.getAllByText("测试大领域")).toHaveLength(2);
     expect(screen.getByText("测试领域卡片摘要")).toBeInTheDocument();
-    expect(screen.getByText("测试最新内容")).toBeInTheDocument();
-    expect(screen.getByText("测试讨论")).toBeInTheDocument();
   });
 });

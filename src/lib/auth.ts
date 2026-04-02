@@ -19,7 +19,6 @@ declare module "next-auth/jwt" {
   interface JWT {
     id?: string;
     role?: string;
-    avatarUrl?: string | null;
   }
 }
 
@@ -79,7 +78,6 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name ?? undefined,
           role: user.role,
-          avatarUrl: user.avatarUrl ?? undefined,
         };
       },
     }),
@@ -90,17 +88,6 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = (user as { role?: string }).role ?? "USER";
-        token.avatarUrl = (user as { avatarUrl?: string | null }).avatarUrl ?? null;
-      } else if (token.id) {
-        try {
-          const dbUser = await prisma.user.findUnique({
-            select: { avatarUrl: true },
-            where: { id: String(token.id) },
-          });
-          token.avatarUrl = dbUser?.avatarUrl ?? null;
-        } catch {
-          token.avatarUrl = null;
-        }
       }
 
       return token;
@@ -109,7 +96,6 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = typeof token.id === "string" ? token.id : token.sub ?? "";
         session.user.role = typeof token.role === "string" ? token.role : "USER";
-        session.user.avatarUrl = typeof token.avatarUrl === "string" ? token.avatarUrl : null;
       }
 
       return session;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { TopicGroupData } from "@/lib/content/queries";
 import { FollowToggleButton } from "@/components/follows/follow-toggle-button";
@@ -12,7 +12,11 @@ type TopicBrowserProps = {
 
 export function TopicBrowser({ groups, mode = "home" }: TopicBrowserProps) {
   const [selectedGroupSlug, setSelectedGroupSlug] = useState(groups[0]?.slug ?? "");
+  const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
+  const [draftQuery, setDraftQuery] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [isError, setIsError] = useState(false);
 
   const selectedGroup = groups.find((group) => group.slug === selectedGroupSlug) ?? groups[0];
   const filteredChildren = useMemo(() => {
@@ -29,22 +33,122 @@ export function TopicBrowser({ groups, mode = "home" }: TopicBrowserProps) {
     });
   }, [query, selectedGroup]);
 
+  const keepFocus = () => {
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const normalized = draftQuery.trim();
+
+    if (!normalized) {
+      setFeedback("请输入关键词后再搜索，例如：去中心化临床、RWE、eCTD。");
+      setIsError(true);
+      keepFocus();
+      return;
+    }
+
+    setQuery(normalized);
+    setFeedback("已按关键词筛选当前领域。");
+    setIsError(false);
+    keepFocus();
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== "Enter") {
+      return;
+    }
+
+    if (draftQuery.trim()) {
+      setFeedback("已按关键词筛选当前领域。");
+      setIsError(false);
+      return;
+    }
+
+    event.preventDefault();
+    setFeedback("请输入关键词后再搜索，例如：去中心化临床、RWE、eCTD。");
+    setIsError(true);
+    keepFocus();
+  };
+
+  const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDraftQuery(event.target.value);
+
+    if (feedback) {
+      setFeedback("");
+      setIsError(false);
+    }
+  };
+
   if (!selectedGroup) {
     return null;
   }
 
   return (
     <section style={{ display: "grid", gap: "16px" }}>
-      <div style={{ display: "grid", gap: "8px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: "16px", flexWrap: "wrap", alignItems: "center" }}>
-          <h3 style={{ margin: 0 }}>{mode === "home" ? "领域结构" : "按大领域浏览"}</h3>
-          {mode === "directory" ? (
-            <span style={{ color: "var(--muted)", fontSize: "0.92rem" }}>{groups.length} 个大领域</span>
-          ) : null}
-        </div>
-        <p style={{ margin: 0, color: "var(--muted)", lineHeight: 1.7 }}>
-          先选大领域，再进入下方小领域；搜索框只用于定位想关注的领域。
-        </p>
+      <div style={{ display: "grid", gap: "8px", justifyItems: "center" }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            display: "flex",
+            gap: "10px",
+            flexWrap: "wrap",
+            width: "min(100%, 760px)",
+            justifyContent: "center",
+          }}
+        >
+          <input
+            ref={inputRef}
+            type="search"
+            name="query"
+            value={draftQuery}
+            onChange={handleQueryChange}
+            onKeyDown={handleKeyDown}
+            placeholder="例如：FDA 483、临床试验、CMC、AI 医疗器械"
+            aria-label="搜索想关注的领域"
+            style={{
+              flex: "1 1 420px",
+              minWidth: "260px",
+              border: "1px solid var(--border)",
+              borderRadius: "14px",
+              padding: "12px 14px",
+              fontSize: "0.96rem",
+              background: "rgba(255,255,255,0.96)",
+              color: "var(--text)",
+            }}
+          />
+          <button
+            type="submit"
+            style={{
+              border: "none",
+              borderRadius: "14px",
+              background: "linear-gradient(135deg, #124f80, #207c79)",
+              color: "#fff",
+              padding: "0 18px",
+              fontWeight: 700,
+              minHeight: "46px",
+              cursor: "pointer",
+            }}
+          >
+            搜索
+          </button>
+        </form>
+
+        {feedback ? (
+          <p
+            aria-live="polite"
+            style={{
+              margin: "-2px 2px 0",
+              minHeight: "1.2em",
+              color: isError ? "#b42318" : "var(--muted)",
+              fontSize: "0.86rem",
+            }}
+          >
+            {feedback}
+          </p>
+        ) : null}
       </div>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
@@ -90,21 +194,6 @@ export function TopicBrowser({ groups, mode = "home" }: TopicBrowserProps) {
             </div>
             <FollowToggleButton slug={selectedGroup.slug} targetType="TOPIC" compact />
           </div>
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜索想关注的领域"
-            aria-label="搜索想关注的领域"
-            style={{
-              width: "100%",
-              border: "1px solid var(--border)",
-              borderRadius: "999px",
-              padding: "12px 16px",
-              fontSize: "0.95rem",
-              background: "rgba(255,255,255,0.94)",
-              color: "var(--text)",
-            }}
-          />
         </div>
 
         <div className="regscope-topic-grid">

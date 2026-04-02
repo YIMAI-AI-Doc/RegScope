@@ -91,14 +91,12 @@ describe("HomePage", () => {
   it("renders the approved homepage sections", async () => {
     render(await HomePage());
 
-    expect(screen.getByText("全球医药法规情报平台")).toBeInTheDocument();
-    expect(screen.getByRole("searchbox", { name: "首页搜索关键词" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "搜索" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /站内热榜 Top10/ })).toBeInTheDocument();
     expect(screen.getByText("热榜测试条目")).toBeInTheDocument();
-    expect(screen.getByText("讨论问答")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "精选讨论摘要" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "进入讨论问答" })).toBeInTheDocument();
     expect(screen.getByText("测试资讯卡片")).toBeInTheDocument();
-    expect(screen.getByText(/测试国家\s+测试来源/)).toBeInTheDocument();
+    expect(screen.getByText("测试来源")).toBeInTheDocument();
     expect(screen.getByText(/1 小时前/)).toBeInTheDocument();
     expect(screen.getByText("测试讨论摘要")).toBeInTheDocument();
     expect(screen.getByText("测试结论")).toBeInTheDocument();

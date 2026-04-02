@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { BrandIdentity } from "@/components/layout/brand-identity";
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
@@ -9,9 +10,13 @@ export function SiteFooter() {
       <div className="site-footer-inner">
         <div className="site-footer-grid">
           <section className="site-footer-brand" aria-label="RegScope 平台介绍">
-            <p className="site-footer-logo">RegScope</p>
+            <Link href="/" className="brand site-footer-logo-link" aria-label="返回 RegScope 首页">
+              <BrandIdentity />
+            </Link>
             <p className="site-footer-description">
-              面向医药与医疗器械监管团队的情报平台，聚合全球监管政策、来源更新与讨论结论，帮助团队更快定位关键变化与执行重点。
+              <span className="site-footer-description-line">全球医药监管信息平台</span>
+              <span className="site-footer-description-line">面向医药、医疗器械监管团队的全球情报平台，汇聚全球监管政策与最新动态，</span>
+              <span className="site-footer-description-line">提炼关键结论，提升决策与执行效率。</span>
             </p>
             <div className="site-footer-tags">
               <span>政策情报</span>

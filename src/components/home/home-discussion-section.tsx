@@ -9,17 +9,16 @@ type HomeDiscussionSectionProps = {
 export function HomeDiscussionSection({ discussions }: HomeDiscussionSectionProps) {
   return (
     <section style={{ display: "grid", gap: "18px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: "16px", alignItems: "end", flexWrap: "wrap" }}>
-        <div style={{ display: "grid", gap: "8px" }}>
-          <p style={{ margin: 0, color: "var(--accent)", fontWeight: 700, letterSpacing: "0.08em" }}>讨论问答</p>
-          <h2 style={{ margin: 0, fontSize: "clamp(1.5rem, 3vw, 2.15rem)", lineHeight: 1.12 }}>
-            问题、证据和当前结论分开呈现
+      <div style={{ display: "grid", gap: "10px" }}>
+        <div>
+          <p style={{ margin: 0, color: "var(--accent)", fontWeight: 700, letterSpacing: "0.08em" }}>讨论摘要</p>
+          <h2 style={{ margin: "4px 0 0", fontSize: "clamp(1.3rem, 2.2vw, 1.75rem)", lineHeight: 1.2 }}>
+            精选讨论摘要
           </h2>
-          <p style={{ margin: 0, maxWidth: "62ch", color: "var(--muted)", lineHeight: 1.75 }}>
-            讨论区不再伪装成文章卡片，而是把结论、证据数和回答数作为一眼能扫到的主信息。
-          </p>
         </div>
-        <Link href="/discussions" style={{ color: "var(--accent)", fontWeight: 700 }}>进入讨论问答</Link>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <Link href="/discussions" style={{ color: "var(--accent)", fontWeight: 700 }}>进入讨论问答</Link>
+        </div>
       </div>
 
       <div style={{ display: "grid", gap: "14px" }}>

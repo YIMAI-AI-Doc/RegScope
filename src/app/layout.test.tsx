@@ -23,6 +23,13 @@ vi.mock("@/components/layout/account-menu", () => ({
   AccountMenu: () => <div>账户入口</div>,
 }));
 
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/",
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}));
+
 import { SiteHeader } from "@/components/layout/site-header";
 
 describe("SiteHeader", () => {
@@ -34,5 +41,6 @@ describe("SiteHeader", () => {
     expect(screen.getByRole("link", { name: "情报搜索" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "领域订阅" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "讨论问答" })).toBeInTheDocument();
+    expect(screen.getByRole("searchbox", { name: "全站搜索关键词" })).toBeInTheDocument();
   });
 });

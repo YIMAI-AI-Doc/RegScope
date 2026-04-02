@@ -2,7 +2,8 @@ import React from "react";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { AccountMenu } from "@/components/layout/account-menu";
-import { BrandMark } from "@/components/layout/brand-mark";
+import { BrandIdentity } from "@/components/layout/brand-identity";
+import { SiteGlobalSearch } from "@/components/layout/site-global-search";
 import { TopnavLinks } from "@/components/layout/topnav-links";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
@@ -58,14 +59,11 @@ export async function SiteHeader() {
   return (
     <header className="topbar">
       <Link href="/" className="brand" aria-label="返回 RegScope 首页">
-        <span className="brand-mark">
-          <BrandMark />
-        </span>
-        <div>
-          <p className="brand-name">药云纵观</p>
-          <p className="brand-tag">RegScope</p>
-        </div>
+        <BrandIdentity />
       </Link>
+      <div className="topbar-search">
+        <SiteGlobalSearch />
+      </div>
       <nav className="topnav" aria-label="主导航">
         <TopnavLinks items={navItems} />
         <AccountMenu

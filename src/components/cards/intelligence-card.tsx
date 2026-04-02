@@ -27,7 +27,6 @@ export function IntelligenceCard({
   href,
   title,
   sourceName,
-  countryName,
   contentTypeLabel,
   publishedAtLabel,
   accent,
@@ -79,11 +78,8 @@ export function IntelligenceCard({
               {contentTypeLabel}
             </span>
           </div>
-          <div>
-            <p style={{ margin: 0, fontSize: "0.88rem", opacity: 0.9 }}>{countryName}</p>
-          </div>
         </div>
-        <div style={{ padding: "12px 14px 14px", display: "grid", gap: "6px", flex: 1, alignContent: "start" }}>
+        <div style={{ padding: "12px 14px 14px", display: "grid", gap: "17px", flex: 1, alignContent: "start" }}>
           <p
             style={{
               margin: 0,
@@ -111,9 +107,9 @@ export function IntelligenceCard({
               overflow: "hidden",
               textOverflow: "ellipsis",
             }}
-            title={`${countryName} ${sourceName} · ${publishedAtLabel}`}
+            title={`${sourceName} · ${publishedAtLabel}`}
           >
-            {countryName} {sourceName} · {publishedAtLabel}
+            {sourceName} · {publishedAtLabel}
           </p>
         </div>
       </Link>
