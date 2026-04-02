@@ -66,10 +66,6 @@ export async function SiteHeader() {
           <p className="brand-tag">RegScope</p>
         </div>
       </Link>
-      <div className="cluster-banner" aria-label="全球医药法规情报平台">
-        <span className="cluster-banner-kicker">Global Pharma Regulatory Intelligence Platform</span>
-        <strong>全球医药法规情报平台</strong>
-      </div>
       <nav className="topnav" aria-label="主导航">
         <TopnavLinks items={navItems} />
         <AccountMenu

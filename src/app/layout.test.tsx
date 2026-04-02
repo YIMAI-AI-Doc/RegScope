@@ -34,6 +34,5 @@ describe("SiteHeader", () => {
     expect(screen.getByRole("link", { name: "情报搜索" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "领域订阅" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "讨论问答" })).toBeInTheDocument();
-    expect(screen.getByLabelText("全球医药法规情报平台")).toBeInTheDocument();
   });
 });

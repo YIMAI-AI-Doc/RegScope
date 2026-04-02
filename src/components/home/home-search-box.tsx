@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-const quickSearchTerms = ["FDA", "EMA", "NMPA", "临床试验", "AI 医疗器械"];
 const EMPTY_QUERY_MESSAGE = "请输入关键词后再搜索，例如：FDA 483、临床试验。";
 const SUBMITTING_MESSAGE = "正在跳转到搜索结果...";
 
@@ -70,6 +68,18 @@ export function HomeSearchBox() {
 
   return (
     <section style={{ display: "grid", gap: "12px", justifyItems: "center" }}>
+      <p
+        style={{
+          margin: 0,
+          color: "var(--muted)",
+          fontSize: "1.84rem",
+          fontWeight: 700,
+          letterSpacing: "0.04em",
+          lineHeight: 1.15,
+        }}
+      >
+        全球医药法规情报平台
+      </p>
       <form
         onSubmit={handleSubmit}
         style={{
@@ -129,36 +139,6 @@ export function HomeSearchBox() {
           {feedback}
         </p>
       ) : null}
-
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "8px",
-          alignItems: "center",
-          justifyContent: "flex-start",
-          width: "min(100%, 760px)",
-        }}
-      >
-        <span style={{ color: "var(--muted)", fontSize: "0.88rem" }}>热门检索：</span>
-        {quickSearchTerms.map((term) => (
-          <Link
-            key={term}
-            href={`/feed?query=${encodeURIComponent(term)}`}
-            style={{
-              borderRadius: "999px",
-              border: "1px solid rgba(31, 79, 134, 0.18)",
-              padding: "5px 10px",
-              fontSize: "0.84rem",
-              color: "var(--accent)",
-              background: "rgba(255,255,255,0.78)",
-              fontWeight: 600,
-            }}
-          >
-            {term}
-          </Link>
-        ))}
-      </div>
     </section>
   );
 }

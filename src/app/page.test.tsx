@@ -91,6 +91,7 @@ describe("HomePage", () => {
   it("renders the approved homepage sections", async () => {
     render(await HomePage());
 
+    expect(screen.getByText("全球医药法规情报平台")).toBeInTheDocument();
     expect(screen.getByRole("searchbox", { name: "首页搜索关键词" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "搜索" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /站内热榜 Top10/ })).toBeInTheDocument();
