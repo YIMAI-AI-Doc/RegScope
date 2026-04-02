@@ -17,7 +17,7 @@ export function TopicCard({ href, label, note, badge, summary }: TopicCardProps)
         padding: "18px",
         display: "grid",
         gap: "12px",
-        minHeight: "170px",
+        minHeight: "198px",
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", alignItems: "start" }}>

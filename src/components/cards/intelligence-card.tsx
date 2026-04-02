@@ -34,8 +34,8 @@ export function IntelligenceCard({
   coverImage,
 }: IntelligenceCardProps) {
   const accentStyles = accentMap[accent];
-  const cardHeight = "clamp(220px, 22vw, 246px)";
-  const coverHeight = "clamp(112px, 12vw, 136px)";
+  const cardHeight = "clamp(246px, 24vw, 272px)";
+  const coverHeight = "clamp(124px, 13vw, 148px)";
   const coverBackground = coverImage
     ? `linear-gradient(135deg, rgba(9, 22, 43, 0.55), rgba(17, 45, 84, 0.28)), url(${coverImage})`
     : accentStyles.cover;

@@ -119,7 +119,7 @@ export function TopicBrowser({ groups, mode = "home" }: TopicBrowserProps) {
                   color: "#fff",
                   display: "grid",
                   gap: "10px",
-                  minHeight: "160px",
+                  minHeight: "186px",
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", alignItems: "start" }}>

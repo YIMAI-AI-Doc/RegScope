@@ -133,20 +133,6 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
         }}
       >
         {!avatar ? <span style={{ fontSize: "0.95rem", letterSpacing: "0.02em" }}>{viewer.isAuthenticated ? initials : "客"}</span> : null}
-        <span
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            right: "2px",
-            bottom: "2px",
-            width: "10px",
-            height: "10px",
-            borderRadius: "999px",
-            border: "2px solid rgba(255,255,255,0.95)",
-            background: viewer.isAuthenticated ? "rgba(26, 160, 98, 0.95)" : "rgba(122, 146, 176, 0.85)",
-            boxShadow: "0 8px 18px rgba(31, 55, 90, 0.16)",
-          }}
-        />
       </button>
 
       {isOpen ? (

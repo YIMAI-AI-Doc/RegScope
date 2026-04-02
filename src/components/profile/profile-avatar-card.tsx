@@ -2,6 +2,8 @@
 
 import React, { useMemo, useRef, useState } from "react";
 
+const MAX_AVATAR_UPLOAD_BYTES = 3 * 1024 * 1024;
+
 type Props = {
   name: string;
   email: string;
@@ -55,7 +57,7 @@ export function ProfileAvatarCard({ name, email, avatarUrl }: Props) {
         <div style={{ display: "grid", gap: "4px" }}>
           <strong style={{ fontSize: "1.1rem" }}>{name || "RegScope 用户"}</strong>
           <span style={{ color: "var(--muted)" }}>{email}</span>
-          <small style={{ color: "var(--muted)" }}>头像仅本地预览，后端存储待接入</small>
+          <small style={{ color: "var(--muted)" }}>上传上限 3MB，服务器会自动压缩为不超过 200KB</small>
         </div>
       </div>
 
@@ -103,6 +105,11 @@ export function ProfileAvatarCard({ name, email, avatarUrl }: Props) {
           onChange={async (event) => {
             const file = event.target.files?.[0];
             if (!file) return;
+            if (file.size > MAX_AVATAR_UPLOAD_BYTES) {
+              setStatus("图片过大，请上传小于 3MB 的图片");
+              event.target.value = "";
+              return;
+            }
             setStatus("上传中…");
             const reader = new FileReader();
             reader.onload = async () => {

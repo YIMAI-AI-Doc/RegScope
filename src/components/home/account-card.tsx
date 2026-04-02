@@ -25,6 +25,7 @@ export function AccountCard({
         padding: "18px",
         display: "grid",
         gap: "14px",
+        minHeight: "198px",
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "start" }}>
