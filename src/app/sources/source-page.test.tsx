@@ -54,7 +54,9 @@ describe("SourcesPage", () => {
 
     expect(screen.getByRole("heading", { name: "官方来源" })).toBeInTheDocument();
     expect(screen.getByText("测试来源卡片摘要")).toBeInTheDocument();
-    expect(screen.getByText("测试最新内容")).toBeInTheDocument();
+    expect(screen.getAllByText("测试最新内容").length).toBeGreaterThan(0);
+    expect(screen.getByRole("button", { name: "预览 测试最新内容" })).toBeInTheDocument();
+    expect(screen.getByText("测试内容摘要")).toBeInTheDocument();
     expect(screen.getByText("测试讨论")).toBeInTheDocument();
   });
 });

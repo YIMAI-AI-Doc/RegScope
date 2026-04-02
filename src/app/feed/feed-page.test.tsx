@@ -60,7 +60,9 @@ describe("FeedPage", () => {
     expect(screen.getByText("搜索结果")).toBeInTheDocument();
     expect(screen.getByText("情报")).toBeInTheDocument();
     expect(screen.getByText("更多筛选")).toBeInTheDocument();
-    expect(screen.getByText("测试快讯")).toBeInTheDocument();
+    expect(screen.getAllByText("测试快讯").length).toBeGreaterThan(0);
+    expect(screen.getByRole("button", { name: "预览 测试快讯" })).toBeInTheDocument();
+    expect(screen.getByText("测试摘要")).toBeInTheDocument();
     expect(screen.getByText("情报结果")).toBeInTheDocument();
   });
 });
