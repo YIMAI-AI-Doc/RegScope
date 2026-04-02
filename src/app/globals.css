@@ -62,9 +62,9 @@ a {
   top: 0;
   z-index: 40;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 760px) minmax(0, 1fr);
+  grid-template-columns: minmax(max-content, 1fr) minmax(280px, 760px) minmax(max-content, 1fr);
   align-items: center;
-  gap: 22px;
+  gap: clamp(12px, 1.15vw, 22px);
   padding: 24.5px 24px;
   border-bottom: 1px solid var(--border);
   background:
@@ -199,7 +199,7 @@ a {
 
 .topbar-search {
   width: 100%;
-  max-width: 550px;
+  max-width: min(550px, 30vw);
   justify-self: center;
 }
 
@@ -249,11 +249,13 @@ a {
 .topnav {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  width: max-content;
+  justify-self: end;
   justify-content: flex-end;
-  gap: 14px;
+  gap: clamp(8px, 0.8vw, 14px);
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: clamp(0.84rem, 0.8vw, 0.9rem);
 }
 
 .topnav a {
@@ -261,7 +263,7 @@ a {
   display: inline-flex;
   align-items: center;
   min-height: 36px;
-  padding: 6px 10px;
+  padding: 6px clamp(6px, 0.65vw, 10px);
   border-radius: 12px;
   font-weight: 600;
   transition: background-color 160ms ease, color 160ms ease;
@@ -765,6 +767,9 @@ a {
 
   .topnav {
     justify-content: flex-start;
+    width: 100%;
+    justify-self: stretch;
+    flex-wrap: wrap;
   }
 
   .homepage-mixed-grid {
@@ -778,6 +783,14 @@ a {
 }
 
 @media (max-width: 1280px) {
+  .topbar {
+    padding-inline: 18px;
+  }
+
+  .topbar-search {
+    max-width: min(460px, 36vw);
+  }
+
   .regscope-grid-five {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }

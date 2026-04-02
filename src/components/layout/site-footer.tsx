@@ -15,7 +15,8 @@ export function SiteFooter() {
             </Link>
             <p className="site-footer-description">
               <span className="site-footer-description-line">全球医药监管信息平台</span>
-              <span className="site-footer-description-line">面向医药、医疗器械监管团队的全球情报平台，汇聚全球监管政策与最新动态，</span>
+              <span className="site-footer-description-line">面向医药、医疗器械监管团队的全球情报平台，</span>
+              <span className="site-footer-description-line">汇聚全球监管政策与最新动态，</span>
               <span className="site-footer-description-line">提炼关键结论，提升决策与执行效率。</span>
             </p>
             <div className="site-footer-tags">

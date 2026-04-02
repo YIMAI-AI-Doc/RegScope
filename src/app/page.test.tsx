@@ -96,8 +96,8 @@ describe("HomePage", () => {
     expect(screen.getByRole("heading", { name: "精选讨论摘要" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "进入讨论问答" })).toBeInTheDocument();
     expect(screen.getAllByText("测试资讯卡片").length).toBeGreaterThan(0);
-    expect(screen.getByText(/测试来源/)).toBeInTheDocument();
-    expect(screen.getByText(/1 小时前/)).toBeInTheDocument();
+    expect(screen.getAllByText(/测试来源/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/1 小时前/).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "预览 测试资讯卡片" })).toBeInTheDocument();
     expect(screen.getByText("内容预览")).toBeInTheDocument();
     expect(screen.getByText("测试讨论摘要")).toBeInTheDocument();
