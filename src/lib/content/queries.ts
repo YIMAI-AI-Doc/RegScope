@@ -14,6 +14,7 @@ export type IntelligenceCardData = {
   contentTypeLabel: string;
   publishedAtLabel: string;
   accent: "blue" | "teal" | "amber" | "violet";
+  coverImage?: string;
 };
 
 export type SmallCardData = {
@@ -1564,6 +1565,13 @@ function filterContentItems(items: DbContentItem[], filters: FeedFilters) {
 }
 
 function mapContentToCard(item: DbContentItem): IntelligenceCardData {
+  let coverImage: string | undefined;
+  if (item.title.includes("FDA 更新 AI")) {
+    coverImage = "/images/card-covers/regulatory-cover-1.png";
+  } else if (item.title.includes("EMA 提醒 CMC") || item.title.includes("EMA 发出 CMC")) {
+    coverImage = "/images/card-covers/regulatory-cover-2.png";
+  }
+
   return {
     slug: item.slug,
     href: `/content/${item.slug}`,
@@ -1575,6 +1583,7 @@ function mapContentToCard(item: DbContentItem): IntelligenceCardData {
     contentTypeLabel: item.contentType,
     publishedAtLabel: formatTimeAgo(item.publishedAt),
     accent: pickAccent(item.contentType),
+    coverImage,
   };
 }
 

@@ -79,12 +79,20 @@ vi.mock("@/lib/content/queries", () => ({
   }),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}));
+
 import HomePage from "./page";
 
 describe("HomePage", () => {
   it("renders the approved homepage sections", async () => {
     render(await HomePage());
 
+    expect(screen.getByRole("searchbox", { name: "首页搜索关键词" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "搜索" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /站内热榜 Top10/ })).toBeInTheDocument();
     expect(screen.getByText("热榜测试条目")).toBeInTheDocument();
     expect(screen.getByText("讨论问答")).toBeInTheDocument();

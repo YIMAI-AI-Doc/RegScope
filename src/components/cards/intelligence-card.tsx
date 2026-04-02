@@ -31,10 +31,14 @@ export function IntelligenceCard({
   contentTypeLabel,
   publishedAtLabel,
   accent,
+  coverImage,
 }: IntelligenceCardProps) {
   const accentStyles = accentMap[accent];
   const cardHeight = "clamp(220px, 22vw, 246px)";
   const coverHeight = "clamp(112px, 12vw, 136px)";
+  const coverBackground = coverImage
+    ? `linear-gradient(135deg, rgba(9, 22, 43, 0.55), rgba(17, 45, 84, 0.28)), url(${coverImage})`
+    : accentStyles.cover;
 
   return (
     <article
@@ -52,7 +56,9 @@ export function IntelligenceCard({
         <div
           style={{
             height: coverHeight,
-            background: `${accentStyles.cover}`,
+            backgroundImage: coverBackground,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             padding: "12px",
             display: "flex",
             flexDirection: "column",
