@@ -16,7 +16,7 @@ const navItems = [
 
 export async function SiteHeader() {
   const session = await getServerSession(authOptions);
-  const viewer = session?.user?.email
+  const viewerSession = session?.user?.email
     ? {
         isAuthenticated: true,
         name: session.user.name ?? null,
@@ -33,13 +33,27 @@ export async function SiteHeader() {
         avatarUrl: null,
         userId: null as string | null,
       };
-  const stats = viewer.isAuthenticated
+  const [latestProfile, stats] = viewerSession.isAuthenticated
     ? await Promise.all([
-        prisma.follow.count({ where: { userId: viewer.userId ?? "" } }),
-        prisma.answer.count({ where: { authorId: viewer.userId ?? "" } }),
-        prisma.discussion.count({ where: { createdById: viewer.userId ?? "" } }),
+        prisma.user.findUnique({
+          where: { id: viewerSession.userId ?? "" },
+          select: { avatarUrl: true, name: true, email: true, role: true },
+        }),
+        Promise.all([
+          prisma.follow.count({ where: { userId: viewerSession.userId ?? "" } }),
+          prisma.answer.count({ where: { authorId: viewerSession.userId ?? "" } }),
+          prisma.discussion.count({ where: { createdById: viewerSession.userId ?? "" } }),
+        ]),
       ])
-    : [0, 0, 0];
+    : [null, [0, 0, 0] as const];
+
+  const viewer = {
+    ...viewerSession,
+    name: latestProfile?.name ?? viewerSession.name,
+    email: latestProfile?.email ?? viewerSession.email,
+    role: latestProfile?.role ?? viewerSession.role,
+    avatarUrl: latestProfile?.avatarUrl ?? viewerSession.avatarUrl,
+  };
 
   return (
     <header className="topbar">

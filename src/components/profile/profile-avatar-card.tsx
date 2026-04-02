@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const MAX_AVATAR_UPLOAD_BYTES = 3 * 1024 * 1024;
 
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export function ProfileAvatarCard({ name, email, avatarUrl }: Props) {
+  const router = useRouter();
   const initials = useMemo(() => {
     const value = name || email || "U";
     return value.slice(0, 1).toUpperCase();
@@ -84,6 +86,7 @@ export function ProfileAvatarCard({ name, email, avatarUrl }: Props) {
             setPreview(null);
             await fetch("/api/me/avatar", { method: "DELETE" });
             setStatus("已重置头像");
+            router.refresh();
           }}
           style={{
             padding: "10px 12px",
@@ -127,6 +130,7 @@ export function ProfileAvatarCard({ name, email, avatarUrl }: Props) {
                 return;
               }
               setStatus("已更新头像");
+              router.refresh();
             };
             reader.readAsDataURL(file);
           }}

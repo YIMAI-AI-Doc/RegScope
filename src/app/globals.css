@@ -13,11 +13,25 @@
   --accent: #21497a;
 }
 
+:root[data-theme="mist"] {
+  --bg: #f6f5f0;
+  --panel: rgba(255, 251, 245, 0.8);
+  --panel-strong: #fffdfa;
+  --text: #17211f;
+  --muted: #6c716f;
+  --border: rgba(156, 150, 138, 0.2);
+  --accent: #5b6d67;
+}
+
 html {
+  background: #ffffff;
+}
+
+html[data-theme="mist"] {
   background:
-    radial-gradient(circle at top left, rgba(112, 154, 212, 0.18), transparent 28%),
-    radial-gradient(circle at top right, rgba(178, 197, 227, 0.28), transparent 24%),
-    linear-gradient(180deg, #f8fbff 0%, #f1f5fb 100%);
+    radial-gradient(circle at top left, rgba(223, 196, 160, 0.18), transparent 28%),
+    radial-gradient(circle at top right, rgba(197, 210, 188, 0.24), transparent 24%),
+    linear-gradient(180deg, #fffdf8 0%, #f6f3ec 100%);
 }
 
 body {
@@ -31,10 +45,7 @@ body {
     "Noto Sans CJK SC",
     system-ui,
     sans-serif;
-  background-image:
-    linear-gradient(rgba(103, 129, 164, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(103, 129, 164, 0.06) 1px, transparent 1px);
-  background-size: 28px 28px;
+  background: #ffffff;
 }
 
 a {

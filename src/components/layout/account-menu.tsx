@@ -28,6 +28,7 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [stickyOpen, setStickyOpen] = useState(false);
   const [hoverOpen, setHoverOpen] = useState(false);
+  const [theme, setTheme] = useState<"light" | "mist">("light");
   const [email, setEmail] = useState(viewer.email ?? "demo@regscope.local");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +49,13 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
     }
     window.addEventListener("pointerdown", handlePointerDown);
     return () => window.removeEventListener("pointerdown", handlePointerDown);
+  }, []);
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem("regscope-theme");
+    const nextTheme = stored === "mist" ? "mist" : "light";
+    setTheme(nextTheme);
+    applyTheme(nextTheme);
   }, []);
 
   async function handleLogin(event: React.FormEvent) {
@@ -103,10 +111,6 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
       <button
         type="button"
         onClick={() => {
-          if (viewer.isAuthenticated) {
-            router.push("/me");
-            return;
-          }
           setStickyOpen((value) => !value);
         }}
         aria-haspopup="menu"
@@ -137,22 +141,27 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
 
       {isOpen ? (
         <div
-          role="menu"
-          aria-label="账户面板"
           style={{
             position: "absolute",
             right: 0,
-            top: "calc(100% + 12px)",
-            width: "min(368px, calc(100vw - 32px))",
-            borderRadius: "22px",
-            border: "1px solid rgba(104, 132, 171, 0.26)",
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244,248,253,0.96))",
-            boxShadow: "0 18px 46px rgba(31, 55, 90, 0.16)",
-            overflow: "hidden",
+            top: "100%",
+            paddingTop: "12px",
             zIndex: 30,
           }}
         >
+          <div
+            role="menu"
+            aria-label="账户面板"
+            style={{
+              width: "min(368px, calc(100vw - 32px))",
+              borderRadius: "22px",
+              border: "1px solid rgba(104, 132, 171, 0.26)",
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244,248,253,0.96))",
+              boxShadow: "0 18px 46px rgba(31, 55, 90, 0.16)",
+              overflow: "hidden",
+            }}
+          >
           <div
             style={{
               padding: "18px 18px 14px",
@@ -212,7 +221,7 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
                 value={stats.followCount}
                 ariaLabel="管理关注"
                 onActivate={() => {
-                  setOpen(false);
+                  setStickyOpen(false);
                   router.push("/me/follows");
                 }}
               />
@@ -263,7 +272,29 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
             <div style={{ borderTop: "1px solid rgba(104, 132, 171, 0.18)" }} />
 
             <div style={{ display: "grid", gap: "6px" }}>
-              <MenuRow label="主题" hint="浅色" trailing="•" />
+              {viewer.isAuthenticated ? (
+                <MenuRow
+                  label="个人中心"
+                  hint="查看资料、收藏与互动"
+                  trailing=">"
+                  onActivate={() => {
+                    setStickyOpen(false);
+                    setHoverOpen(false);
+                    router.push("/me");
+                  }}
+                />
+              ) : null}
+              <MenuRow
+                label="主题"
+                hint={theme === "light" ? "浅色" : "柔雾"}
+                trailing="•"
+                onActivate={() => {
+                  const nextTheme = theme === "light" ? "mist" : "light";
+                  setTheme(nextTheme);
+                  applyTheme(nextTheme);
+                  window.localStorage.setItem("regscope-theme", nextTheme);
+                }}
+              />
             </div>
 
             <div style={{ borderTop: "1px solid rgba(104, 132, 171, 0.18)" }} />
@@ -275,9 +306,19 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
             ) : null}
           </div>
         </div>
+        </div>
       ) : null}
     </div>
   );
+}
+
+function applyTheme(theme: "light" | "mist") {
+  const root = document.documentElement;
+  if (theme === "light") {
+    root.removeAttribute("data-theme");
+    return;
+  }
+  root.setAttribute("data-theme", theme);
 }
 
 function Stat({
@@ -330,9 +371,29 @@ function Stat({
   );
 }
 
-function MenuRow({ label, hint, trailing }: { label: string; hint: string; trailing: string }) {
+function MenuRow({
+  label,
+  hint,
+  trailing,
+  onActivate,
+}: {
+  label: string;
+  hint: string;
+  trailing: string;
+  onActivate?: () => void;
+}) {
   return (
     <div
+      role={onActivate ? "button" : undefined}
+      tabIndex={onActivate ? 0 : undefined}
+      onClick={onActivate}
+      onKeyDown={(event) => {
+        if (!onActivate) return;
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onActivate();
+        }
+      }}
       style={{
         display: "flex",
         alignItems: "center",
@@ -342,6 +403,7 @@ function MenuRow({ label, hint, trailing }: { label: string; hint: string; trail
         borderRadius: "14px",
         border: "1px solid rgba(104, 132, 171, 0.14)",
         background: "rgba(31,79,134,0.02)",
+        cursor: onActivate ? "pointer" : "default",
       }}
     >
       <span style={{ fontWeight: 700 }}>{label}</span>

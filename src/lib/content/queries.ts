@@ -864,7 +864,7 @@ function buildHomepageFeaturedCards(contentItems: DbContentItem[]) {
   const cards = sourceItems.map(mapContentToCard);
 
   if (cards.length >= 30) {
-    return cards.slice(0, 30);
+    return applyHomepageCoverImages(cards.slice(0, 30));
   }
 
   const extended: IntelligenceCardData[] = [...cards];
@@ -879,7 +879,27 @@ function buildHomepageFeaturedCards(contentItems: DbContentItem[]) {
     cursor += 1;
   }
 
-  return extended;
+  return applyHomepageCoverImages(extended);
+}
+
+function applyHomepageCoverImages(cards: IntelligenceCardData[]) {
+  const homepageCoverImages = [
+    "/images/card-covers/homepage-card-1.png",
+    "/images/card-covers/homepage-card-2.png",
+    "/images/card-covers/homepage-card-3.png",
+    "/images/card-covers/homepage-card-4.png",
+    "/images/card-covers/homepage-card-5.png",
+    "/images/card-covers/homepage-card-6.png",
+  ] as const;
+
+  return cards.map((card, index) =>
+    index < homepageCoverImages.length
+      ? {
+          ...card,
+          coverImage: homepageCoverImages[index],
+        }
+      : card,
+  );
 }
 
 type HomepageDiscussionRecord = Awaited<ReturnType<typeof loadDiscussionDigests>>[number];
