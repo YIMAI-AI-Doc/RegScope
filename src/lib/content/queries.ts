@@ -1601,7 +1601,7 @@ function mapContentToCard(item: DbContentItem): IntelligenceCardData {
     countryName: item.country?.name ?? "全球",
     topicName: item.primaryTopic?.name ?? "未分类",
     contentTypeLabel: item.contentType,
-    publishedAtLabel: formatTimeAgo(item.publishedAt),
+    publishedAtLabel: formatCardPublishedAtLabel(item.publishedAt),
     accent: pickAccent(item.contentType),
     coverImage,
   };
@@ -1656,4 +1656,27 @@ function formatTimeAgo(date: Date) {
     minute: "2-digit",
     hour12: false,
   }).format(date);
+}
+
+function formatCardPublishedAtLabel(date: Date) {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+
+  if (diffMs >= 0) {
+    const diffHours = Math.max(1, Math.floor(diffMs / (1000 * 60 * 60)));
+
+    if (diffHours < 24) {
+      return `${diffHours} 小时前`;
+    }
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  if (year === now.getFullYear()) {
+    return `${month}-${day}`;
+  }
+
+  return `${year}-${month}-${day}`;
 }
