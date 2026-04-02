@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import type { TopicGroupData } from "@/lib/content/queries";
-import { FollowToggleButton } from "@/components/follows/follow-toggle-button";
 
 type TopicBrowserProps = {
   groups: TopicGroupData[];
@@ -17,6 +16,10 @@ export function TopicBrowser({ groups, mode = "home" }: TopicBrowserProps) {
   const [draftQuery, setDraftQuery] = useState("");
   const [feedback, setFeedback] = useState("");
   const [isError, setIsError] = useState(false);
+  const [followingByTopicSlug, setFollowingByTopicSlug] = useState<Record<string, boolean>>({});
+  const [followErrorByTopicSlug, setFollowErrorByTopicSlug] = useState<Record<string, string>>({});
+  const [pendingTopicSlug, setPendingTopicSlug] = useState("");
+  const [isFollowPending, startFollowTransition] = useTransition();
 
   const selectedGroup = groups.find((group) => group.slug === selectedGroupSlug) ?? groups[0];
   const filteredChildren = useMemo(() => {
@@ -80,6 +83,49 @@ export function TopicBrowser({ groups, mode = "home" }: TopicBrowserProps) {
       setFeedback("");
       setIsError(false);
     }
+  };
+
+  const handleFollowToggle = (topicSlug: string, topicLabel: string) => {
+    const nextFollowState = !Boolean(followingByTopicSlug[topicSlug]);
+    setFollowErrorByTopicSlug((current) => ({ ...current, [topicSlug]: "" }));
+    setPendingTopicSlug(topicSlug);
+    startFollowTransition(async () => {
+      try {
+        const response = await fetch("/api/follows", {
+          method: nextFollowState ? "POST" : "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ targetType: "TOPIC", slug: topicSlug, name: topicLabel }),
+        });
+
+        if (response.status === 401) {
+          const callbackUrl = encodeURIComponent(window.location.pathname + window.location.search);
+          window.location.href = `/api/auth/signin?callbackUrl=${callbackUrl}`;
+          return;
+        }
+
+        if (!response.ok) {
+          setFollowErrorByTopicSlug((current) => ({
+            ...current,
+            [topicSlug]: "关注操作失败，请稍后重试。",
+          }));
+          return;
+        }
+
+        setFollowingByTopicSlug((current) => ({
+          ...current,
+          [topicSlug]: nextFollowState,
+        }));
+      } catch {
+        setFollowErrorByTopicSlug((current) => ({
+          ...current,
+          [topicSlug]: "关注操作失败，请稍后重试。",
+        }));
+      } finally {
+        setPendingTopicSlug("");
+      }
+    });
   };
 
   if (!selectedGroup) {
@@ -190,45 +236,52 @@ export function TopicBrowser({ groups, mode = "home" }: TopicBrowserProps) {
           <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
             <div>
               <strong style={{ display: "block", fontSize: "1.02rem" }}>{selectedGroup.label}</strong>
-              <p style={{ margin: "6px 0 0", color: "var(--muted)", lineHeight: 1.7 }}>{selectedGroup.description}</p>
             </div>
-            <FollowToggleButton slug={selectedGroup.slug} targetType="TOPIC" compact />
           </div>
         </div>
 
         <div className="regscope-topic-grid">
           {filteredChildren.length > 0 ? (
-            filteredChildren.map((topic) => (
-              <article
-                key={topic.slug}
-                style={{
-                  borderRadius: "22px",
-                  padding: "18px 16px",
-                  background: "linear-gradient(135deg, #0f5f78, #1d4c73)",
-                  color: "#fff",
-                  display: "grid",
-                  gap: "10px",
-                  minHeight: "186px",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", alignItems: "start" }}>
-                  <strong style={{ lineHeight: 1.35 }}>{topic.label}</strong>
-                  {topic.badge ? (
-                    <span style={{ borderRadius: "999px", padding: "4px 8px", background: "rgba(255,255,255,0.16)", fontSize: "0.72rem", fontWeight: 700 }}>
-                      {topic.badge}
-                    </span>
+            filteredChildren.map((topic) => {
+              const isFollowing = Boolean(followingByTopicSlug[topic.slug]);
+              const isPendingThisTopic = isFollowPending && pendingTopicSlug === topic.slug;
+
+              return (
+                <article
+                  key={topic.slug}
+                  className="topic-subcard"
+                  style={{
+                    borderRadius: "16px",
+                    padding: "12px 10px",
+                    background: "linear-gradient(135deg, #0f5f78, #1d4c73)",
+                    color: "#fff",
+                    display: "grid",
+                    gap: "6px",
+                    minHeight: "99px",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", alignItems: "start" }}>
+                    <Link href={topic.href} style={{ color: "#fff" }}>
+                      <strong style={{ lineHeight: 1.25, fontSize: "0.94rem" }}>{topic.label}</strong>
+                    </Link>
+                    <button
+                      type="button"
+                      className="topic-card-follow-plus"
+                      onClick={() => handleFollowToggle(topic.slug, topic.label)}
+                      disabled={isPendingThisTopic}
+                      aria-label={isFollowing ? `取消关注 ${topic.label}` : `关注 ${topic.label}`}
+                      title={isFollowing ? "取消关注该小领域" : "关注该小领域"}
+                    >
+                      {isPendingThisTopic ? "…" : isFollowing ? "✓" : "+"}
+                    </button>
+                  </div>
+                  <p style={{ margin: 0, lineHeight: 1.45, opacity: 0.9, fontSize: "0.82rem" }}>{topic.summary}</p>
+                  {followErrorByTopicSlug[topic.slug] ? (
+                    <p style={{ margin: 0, color: "#ffd6d1", fontSize: "0.72rem" }}>{followErrorByTopicSlug[topic.slug]}</p>
                   ) : null}
-                </div>
-                <span style={{ fontSize: "0.84rem", opacity: 0.88 }}>{topic.note}</span>
-                <p style={{ margin: 0, lineHeight: 1.6, opacity: 0.92 }}>{topic.summary}</p>
-                <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
-                  <Link href={topic.href} style={{ color: "#fff", fontWeight: 700 }}>
-                    查看相关内容
-                  </Link>
-                  <span style={{ fontSize: "0.82rem", opacity: 0.84 }}>小领域入口</span>
-                </div>
-              </article>
-            ))
+                </article>
+              );
+            })
           ) : (
             <div
               style={{

@@ -1386,7 +1386,7 @@ function mapContentToDetail(item: DbContentItem): ContentDetailData {
 
 function createSubtopicCards(items: Array<[string, string]>, topicSlug: string): CatalogCardData[] {
   return items.map(([label, summary], index) => ({
-    slug: `${label}-${index}`,
+    slug: `${topicSlug}-${index + 1}`,
     href: buildFeedHref({ tab: "intelligence", topic: topicSlug, query: label }),
     label,
     note: "小领域",

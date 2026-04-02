@@ -7,6 +7,7 @@ import { prisma } from "@/lib/db";
 const followTargetSchema = z.object({
   targetType: z.enum(["SOURCE", "COUNTRY", "TOPIC"]),
   slug: z.string().min(1),
+  name: z.string().min(1).optional(),
 });
 
 type FollowTargetType = z.infer<typeof followTargetSchema>["targetType"];
@@ -34,14 +35,41 @@ async function requireSessionUser(request: NextRequest) {
   return user;
 }
 
-async function resolveTarget(targetType: FollowTargetType, slug: string) {
+function fallbackTopicName(slug: string) {
+  const normalized = slug
+    .replace(/-\d+$/, "")
+    .replace(/[-_]+/g, " ")
+    .trim();
+
+  return normalized.length > 0 ? normalized : "未命名领域";
+}
+
+async function resolveTarget(
+  targetType: FollowTargetType,
+  slug: string,
+  action: "follow" | "unfollow",
+  name?: string,
+) {
   switch (targetType) {
     case "SOURCE":
       return prisma.source.findUnique({ where: { slug } });
     case "COUNTRY":
       return prisma.country.findUnique({ where: { slug } });
-    case "TOPIC":
-      return prisma.topic.findUnique({ where: { slug } });
+    case "TOPIC": {
+      const topic = await prisma.topic.findUnique({ where: { slug } });
+
+      if (topic || action === "unfollow") {
+        return topic;
+      }
+
+      return prisma.topic.create({
+        data: {
+          slug,
+          name: name?.trim() || fallbackTopicName(slug),
+          level: 2,
+        },
+      });
+    }
     default:
       return null;
   }
@@ -78,8 +106,11 @@ async function handleFollowMutation(request: NextRequest, action: "follow" | "un
     return NextResponse.json({ error: "Invalid target" }, { status: 400 });
   }
 
-  const target = await resolveTarget(parsed.data.targetType, parsed.data.slug);
+  const target = await resolveTarget(parsed.data.targetType, parsed.data.slug, action, parsed.data.name);
   if (!target) {
+    if (action === "unfollow") {
+      return NextResponse.json({ status: "unfollowed", targetType: parsed.data.targetType, slug: parsed.data.slug });
+    }
     return NextResponse.json({ error: "Target not found" }, { status: 404 });
   }
 

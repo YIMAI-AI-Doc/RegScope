@@ -18,6 +18,7 @@ vi.mock("@/lib/db", () => ({
     },
     topic: {
       findUnique: vi.fn(),
+      create: vi.fn(),
     },
     follow: {
       deleteMany: vi.fn(),
@@ -82,5 +83,39 @@ describe("follows route", () => {
 
     expect(response.status).toBe(200);
     expect(mockedPrisma.follow.deleteMany).toHaveBeenCalled();
+  });
+
+  it("creates topic target on follow when topic slug is missing", async () => {
+    mockedGetToken.mockResolvedValue({ email: "demo@regscope.local", name: "Demo User" } as never);
+    mockedPrisma.user.upsert.mockResolvedValue({ id: "user-1" } as never);
+    mockedPrisma.topic.findUnique.mockResolvedValue(null as never);
+    mockedPrisma.topic.create.mockResolvedValue({
+      id: "topic-2",
+      slug: "clinical-trials-1",
+      name: "方案设计",
+    } as never);
+    mockedPrisma.follow.deleteMany.mockResolvedValue({ count: 0 } as never);
+    mockedPrisma.follow.create.mockResolvedValue({ id: "follow-2" } as never);
+
+    const response = await POST(
+      makeRequest("POST", { targetType: "TOPIC", slug: "clinical-trials-1", name: "方案设计" }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mockedPrisma.topic.create).toHaveBeenCalled();
+    expect(mockedPrisma.follow.create).toHaveBeenCalled();
+  });
+
+  it("keeps DELETE idempotent when topic slug does not exist", async () => {
+    mockedGetToken.mockResolvedValue({ email: "demo@regscope.local", name: "Demo User" } as never);
+    mockedPrisma.user.upsert.mockResolvedValue({ id: "user-1" } as never);
+    mockedPrisma.topic.findUnique.mockResolvedValue(null as never);
+
+    const response = await DELETE(
+      makeRequest("DELETE", { targetType: "TOPIC", slug: "clinical-trials-1" }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mockedPrisma.follow.deleteMany).not.toHaveBeenCalled();
   });
 });

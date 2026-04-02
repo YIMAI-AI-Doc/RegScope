@@ -109,6 +109,7 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
     >
       <span className="account-touchpad" aria-hidden="true" />
       <button
+        className="account-avatar-trigger"
         type="button"
         onClick={() => {
           setStickyOpen((value) => !value);
