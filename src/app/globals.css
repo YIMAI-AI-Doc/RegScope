@@ -612,9 +612,11 @@ a {
 }
 
 .homepage-mixed-grid {
+  --homepage-intel-card-height: clamp(246px, 24vw, 272px);
+  --homepage-mixed-grid-gap: 24px;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
+  gap: var(--homepage-mixed-grid-gap);
 }
 
 .homepage-hot-cluster {
@@ -625,7 +627,11 @@ a {
   align-content: start;
   gap: 10px;
   padding: 16px;
-  height: clamp(430px, 35vw, 500px);
+  height: calc(
+    var(--homepage-intel-card-height) +
+    var(--homepage-intel-card-height) +
+    var(--homepage-mixed-grid-gap)
+  );
   border: 1px solid rgba(166, 186, 204, 0.28);
   border-radius: 22px;
   color: #17211f;
@@ -1067,14 +1073,15 @@ a {
 .regscope-grid-three {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  column-gap: 14px;
+  row-gap: 24px;
 }
 
 .regscope-grid-five {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   column-gap: 12px;
-  row-gap: 10px;
+  row-gap: 24px;
 }
 
 .regscope-topic-grid {
@@ -1193,6 +1200,7 @@ a {
   .homepage-hot-cluster {
     grid-column: span 1;
     grid-row: span 1;
+    height: auto;
   }
 }
 

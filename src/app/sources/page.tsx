@@ -26,7 +26,7 @@ export default async function SourcesPage() {
           <h2 style={{ margin: 0 }}>来源矩阵</h2>
           <span style={{ color: "var(--muted)" }}>{data.cards.length} 项</span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", columnGap: "14px", rowGap: "24px" }}>
           {data.cards.map((card) => (
             <SourceCard key={card.slug} {...card} />
           ))}

@@ -25,7 +25,7 @@ export default async function CountriesPage() {
           <h2 style={{ margin: 0 }}>国家卡片</h2>
           <span style={{ color: "var(--muted)" }}>{data.cards.length} 项</span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", columnGap: "14px", rowGap: "24px" }}>
           {data.cards.map((card) => (
             <CatalogCard key={card.slug} {...card} />
           ))}

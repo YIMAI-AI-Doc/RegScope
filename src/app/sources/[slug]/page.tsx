@@ -58,7 +58,7 @@ export default async function SourceDetailPage({ params }: SourcePageProps) {
 
       <section style={{ display: "grid", gap: "14px" }}>
         <h2 style={{ margin: 0 }}>来源卡片</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", columnGap: "14px", rowGap: "24px" }}>
           <SourceCard {...data.source} />
         </div>
       </section>
@@ -82,7 +82,7 @@ export default async function SourceDetailPage({ params }: SourcePageProps) {
           <h2 style={{ margin: 0 }}>相关领域</h2>
           <span style={{ color: "var(--muted)" }}>{data.relatedTopics.length} 项</span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", columnGap: "14px", rowGap: "24px" }}>
           {data.relatedTopics.map((topic) => (
             <TopicCard key={topic.slug} {...topic} />
           ))}

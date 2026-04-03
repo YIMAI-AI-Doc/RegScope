@@ -64,7 +64,7 @@ export default async function FeedPage({ searchParams }: FeedPageProps) {
       {data.activeTab === "all" ? (
         <div style={{ display: "grid", gap: "20px" }}>
           <ResultSection title="情报结果" count={data.items.length}>
-            <div className="regscope-grid-five" style={{ rowGap: "10px" }}>
+            <div className="regscope-grid-five">
               {data.items.slice(0, 5).map((item) => (
                 <IntelligenceCard key={item.slug} {...item} />
               ))}
@@ -100,7 +100,7 @@ export default async function FeedPage({ searchParams }: FeedPageProps) {
       {data.activeTab === "intelligence" ? (
         <ResultSection title="情报结果" count={data.items.length}>
           {data.items.length > 0 ? (
-            <div className="regscope-grid-five" style={{ rowGap: "10px" }}>
+            <div className="regscope-grid-five">
               {data.items.map((item) => (
                 <IntelligenceCard key={item.slug} {...item} />
               ))}

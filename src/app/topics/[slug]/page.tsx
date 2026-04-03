@@ -60,7 +60,7 @@ export default async function TopicDetailPage({ params }: TopicPageProps) {
           <h2 style={{ margin: 0 }}>细分关注点</h2>
           <span style={{ color: "var(--muted)" }}>{data.subtopics.length} 项</span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", columnGap: "14px", rowGap: "24px" }}>
           {data.subtopics.map((subtopic) => (
             <TopicCard key={subtopic.slug} {...subtopic} />
           ))}
@@ -72,7 +72,7 @@ export default async function TopicDetailPage({ params }: TopicPageProps) {
           <h2 style={{ margin: 0 }}>相关来源</h2>
           <span style={{ color: "var(--muted)" }}>{data.relatedSources.length} 项</span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", columnGap: "14px", rowGap: "24px" }}>
           {data.relatedSources.map((source) => (
             <SourceCard key={source.slug} {...source} />
           ))}

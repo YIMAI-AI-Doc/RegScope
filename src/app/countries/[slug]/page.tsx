@@ -58,7 +58,7 @@ export default async function CountryDetailPage({ params }: CountryPageProps) {
 
       <section style={{ display: "grid", gap: "14px" }}>
         <h2 style={{ margin: 0 }}>国家卡片</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", columnGap: "14px", rowGap: "24px" }}>
           <CountryCard {...data.country} />
         </div>
       </section>
@@ -82,7 +82,7 @@ export default async function CountryDetailPage({ params }: CountryPageProps) {
           <h2 style={{ margin: 0 }}>相关来源</h2>
           <span style={{ color: "var(--muted)" }}>{data.relatedSources.length} 项</span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", columnGap: "14px", rowGap: "24px" }}>
           {data.relatedSources.map((source) => (
             <SourceCard key={source.slug} {...source} />
           ))}
@@ -94,7 +94,7 @@ export default async function CountryDetailPage({ params }: CountryPageProps) {
           <h2 style={{ margin: 0 }}>相关领域</h2>
           <span style={{ color: "var(--muted)" }}>{data.relatedTopics.length} 项</span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", columnGap: "14px", rowGap: "24px" }}>
           {data.relatedTopics.map((topic) => (
             <TopicCard key={topic.slug} {...topic} />
           ))}
