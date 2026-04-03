@@ -4,6 +4,29 @@ import React, { useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import type { TopicGroupData } from "@/lib/content/queries";
 
+const TOPIC_CARD_PALETTES = [
+  { accent: "#b64a37", soft: "#f6e3d8", glow: "rgba(182, 74, 55, 0.22)" },
+  { accent: "#1d8e7d", soft: "#dcf3ee", glow: "rgba(29, 142, 125, 0.2)" },
+  { accent: "#2f73b6", soft: "#dcecff", glow: "rgba(47, 115, 182, 0.22)" },
+  { accent: "#8462d7", soft: "#e8ddff", glow: "rgba(132, 98, 215, 0.2)" },
+  { accent: "#cf7a19", soft: "#f8e8d1", glow: "rgba(207, 122, 25, 0.2)" },
+  { accent: "#bc4e7d", soft: "#f6dde8", glow: "rgba(188, 78, 125, 0.2)" },
+];
+
+function getTopicBadgeText(label: string) {
+  const normalized = label.replace(/\s+/g, "").trim();
+
+  if (!normalized) {
+    return "专题";
+  }
+
+  if (/^[A-Za-z]/.test(normalized)) {
+    return normalized.slice(0, Math.min(3, normalized.length)).toUpperCase();
+  }
+
+  return normalized.slice(0, Math.min(2, normalized.length));
+}
+
 type TopicBrowserProps = {
   groups: TopicGroupData[];
   mode?: "home" | "directory";
@@ -139,52 +162,66 @@ export function TopicBrowser({ groups, mode = "home" }: TopicBrowserProps) {
           onSubmit={handleSubmit}
           style={{
             display: "flex",
-            gap: "10px",
-            flexWrap: "wrap",
             width: "100%",
             justifyContent: "flex-end",
             alignItems: "center",
           }}
         >
-          <input
-            ref={inputRef}
-            type="search"
-            name="query"
-            value={draftQuery}
-            onChange={handleQueryChange}
-            onKeyDown={handleKeyDown}
-            placeholder="例如：临床试验、CMC 与生产、标签与说明书、药物警戒"
-            aria-label="搜索想关注的领域"
+          <div
             style={{
-              flex: "0 1 380px",
               width: "100%",
+              maxWidth: "470px",
               minWidth: "220px",
-              boxSizing: "border-box",
               height: "40px",
-              border: "1px solid var(--border)",
-              borderRadius: "999px",
-              padding: "0 16px",
-              fontSize: "0.96rem",
-              background: "rgba(255,255,255,0.96)",
-              color: "var(--text)",
-            }}
-          />
-          <button
-            type="submit"
-            style={{
+              display: "flex",
+              alignItems: "center",
               boxSizing: "border-box",
-              height: "40px",
               border: "1px solid #b8b8b8",
               borderRadius: "999px",
-              background: "transparent",
-              color: "#000",
-              padding: "0 18px",
-              fontWeight: 700,
-              cursor: "pointer",
+              background: "rgba(255,255,255,0.96)",
+              overflow: "hidden",
             }}
           >
-            搜索
-          </button>
+            <input
+              ref={inputRef}
+              type="search"
+              name="query"
+              value={draftQuery}
+              onChange={handleQueryChange}
+              onKeyDown={handleKeyDown}
+              placeholder="例如：临床试验、CMC 与生产、标签与说明书、药物警戒"
+              aria-label="搜索想关注的领域"
+              style={{
+                flex: 1,
+                minWidth: 0,
+                height: "100%",
+                boxSizing: "border-box",
+                border: "none",
+                outline: "none",
+                padding: "0 16px",
+                fontSize: "0.96rem",
+                background: "transparent",
+                color: "var(--text)",
+              }}
+            />
+            <button
+              type="submit"
+              style={{
+                height: "calc(100% - 8px)",
+                margin: "4px",
+                border: "none",
+                borderRadius: "999px",
+                background: "rgba(0, 0, 0, 0.04)",
+                color: "#000",
+                padding: "0 18px",
+                fontWeight: 700,
+                cursor: "pointer",
+                flex: "0 0 auto",
+              }}
+            >
+              搜索
+            </button>
+          </div>
         </form>
 
         {feedback ? (
@@ -248,42 +285,40 @@ export function TopicBrowser({ groups, mode = "home" }: TopicBrowserProps) {
 
         <div className="regscope-topic-grid">
           {filteredChildren.length > 0 ? (
-            filteredChildren.map((topic) => {
+            filteredChildren.map((topic, index) => {
               const isFollowing = Boolean(followingByTopicSlug[topic.slug]);
               const isPendingThisTopic = isFollowPending && pendingTopicSlug === topic.slug;
+              const palette = TOPIC_CARD_PALETTES[index % TOPIC_CARD_PALETTES.length];
+              const cardStyle = {
+                "--topic-accent": palette.accent,
+                "--topic-soft": palette.soft,
+                "--topic-glow": palette.glow,
+              } as React.CSSProperties;
 
               return (
-                <article
-                  key={topic.slug}
-                  className="topic-subcard"
-                  style={{
-                    borderRadius: "16px",
-                    padding: "12px 10px",
-                    background: "linear-gradient(135deg, #0f5f78, #1d4c73)",
-                    color: "#fff",
-                    display: "grid",
-                    gap: "6px",
-                    minHeight: "99px",
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", alignItems: "start" }}>
-                    <Link href={topic.href} style={{ color: "#fff" }}>
-                      <strong style={{ lineHeight: 1.25, fontSize: "0.94rem" }}>{topic.label}</strong>
-                    </Link>
-                    <button
-                      type="button"
-                      className="topic-card-follow-plus"
-                      onClick={() => handleFollowToggle(topic.slug, topic.label)}
-                      disabled={isPendingThisTopic}
-                      aria-label={isFollowing ? `取消关注 ${topic.label}` : `关注 ${topic.label}`}
-                      title={isFollowing ? "取消关注该小领域" : "关注该小领域"}
-                    >
-                      {isPendingThisTopic ? "…" : isFollowing ? "✓" : "+"}
-                    </button>
-                  </div>
-                  <p style={{ margin: 0, lineHeight: 1.45, opacity: 0.9, fontSize: "0.82rem" }}>{topic.summary}</p>
+                <article key={topic.slug} className="topic-subcard" style={cardStyle}>
+                  <button
+                    type="button"
+                    className="topic-card-follow-plus"
+                    onClick={() => handleFollowToggle(topic.slug, topic.label)}
+                    disabled={isPendingThisTopic}
+                    data-following={isFollowing ? "true" : "false"}
+                    aria-label={isFollowing ? `取消关注 ${topic.label}` : `关注 ${topic.label}`}
+                    title={isFollowing ? "取消关注该小领域" : "关注该小领域"}
+                  >
+                    {isPendingThisTopic ? "…" : isFollowing ? "✓" : "+"}
+                  </button>
+                  <Link href={topic.href} className="topic-subcard-link" style={{ color: "inherit" }}>
+                    <div className="topic-subcard-badge" aria-hidden="true">
+                      <span className="topic-subcard-badge-text">{getTopicBadgeText(topic.label)}</span>
+                    </div>
+                    <div className="topic-subcard-copy">
+                      <strong className="topic-subcard-title">{topic.label}</strong>
+                      <p className="topic-subcard-summary">{topic.summary}</p>
+                    </div>
+                  </Link>
                   {followErrorByTopicSlug[topic.slug] ? (
-                    <p style={{ margin: 0, color: "#ffd6d1", fontSize: "0.72rem" }}>{followErrorByTopicSlug[topic.slug]}</p>
+                    <p className="topic-subcard-error">{followErrorByTopicSlug[topic.slug]}</p>
                   ) : null}
                 </article>
               );
