@@ -4,7 +4,6 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { getServerSession } from "next-auth";
 import { DiscussionCard } from "@/components/cards/discussion-card";
-import { HomeSearchBox } from "@/components/home/home-search-box";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { DISCUSSION_HISTORY_COOKIE, parseDiscussionHistory } from "@/lib/discussions/history";
@@ -58,20 +57,10 @@ export default async function DiscussionsPage() {
 
   return (
     <div style={{ display: "grid", gap: "24px" }}>
-      <section style={{ display: "grid", gap: "12px", justifyItems: "center" }}>
-        <div style={{ width: "100%" }}>
-          <p style={{ margin: 0, color: "var(--accent)", fontWeight: 700, letterSpacing: "0.08em" }}>讨论问答</p>
-          <h1 style={{ margin: 0, fontSize: "clamp(1.9rem, 4vw, 3rem)", lineHeight: 1.1 }}>{data.title}</h1>
-        </div>
-        <div style={{ width: "100%" }}>
-          <HomeSearchBox />
-        </div>
-      </section>
-
       <section style={{ display: "grid", gap: "14px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
           <div>
-            <h2 style={{ margin: 0 }}>为你推荐</h2>
+            <h2 style={{ margin: 0 }}>精彩推荐</h2>
             <p style={{ margin: "6px 0 0", color: "var(--muted)", lineHeight: 1.7 }}>
               按最近浏览、关注范围和讨论活跃度综合排序。
             </p>

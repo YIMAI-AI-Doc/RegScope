@@ -30,12 +30,7 @@ export function DailyQuestionPanel({ hotCluster, initialQuestion }: DailyQuestio
     setQuestion(initialQuestion);
     setSelectedOptions([]);
     setError(null);
-  }, [
-    initialQuestion?.dateKey,
-    initialQuestion?.canAnswer,
-    initialQuestion?.hasAnswered,
-    initialQuestion?.selectedOption,
-  ]);
+  }, [initialQuestion]);
 
   function handleSelect(option: DailyQuizOptionKey) {
     if (!question || question.hasAnswered || !question.canAnswer || isPending) {
@@ -105,7 +100,7 @@ export function DailyQuestionPanel({ hotCluster, initialQuestion }: DailyQuestio
       .finally(() => {
         setIsLoadingQuestion(false);
       });
-  }, [activeTab, question, startTransition]);
+  }, [activeTab, initialQuestion, question, startTransition]);
 
   useEffect(() => {
     if (activeTab !== "daily" || !question?.hasAnswered) {

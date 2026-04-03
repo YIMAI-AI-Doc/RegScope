@@ -134,15 +134,16 @@ export function TopicBrowser({ groups, mode = "home" }: TopicBrowserProps) {
 
   return (
     <section style={{ display: "grid", gap: "16px" }}>
-      <div style={{ display: "grid", gap: "8px", justifyItems: "center" }}>
+      <div style={{ display: "grid", gap: "8px", justifyItems: "stretch" }}>
         <form
           onSubmit={handleSubmit}
           style={{
             display: "flex",
             gap: "10px",
             flexWrap: "wrap",
-            width: "min(100%, 760px)",
-            justifyContent: "center",
+            width: "100%",
+            justifyContent: "flex-end",
+            alignItems: "center",
           }}
         >
           <input
@@ -152,14 +153,17 @@ export function TopicBrowser({ groups, mode = "home" }: TopicBrowserProps) {
             value={draftQuery}
             onChange={handleQueryChange}
             onKeyDown={handleKeyDown}
-            placeholder="例如：FDA 483、临床试验、CMC、AI 医疗器械"
+            placeholder="例如：临床试验、CMC 与生产、标签与说明书、药物警戒"
             aria-label="搜索想关注的领域"
             style={{
-              flex: "1 1 420px",
-              minWidth: "260px",
+              flex: "0 1 380px",
+              width: "100%",
+              minWidth: "220px",
+              boxSizing: "border-box",
+              height: "40px",
               border: "1px solid var(--border)",
-              borderRadius: "14px",
-              padding: "12px 14px",
+              borderRadius: "999px",
+              padding: "0 16px",
               fontSize: "0.96rem",
               background: "rgba(255,255,255,0.96)",
               color: "var(--text)",
@@ -168,13 +172,14 @@ export function TopicBrowser({ groups, mode = "home" }: TopicBrowserProps) {
           <button
             type="submit"
             style={{
-              border: "none",
-              borderRadius: "14px",
-              background: "linear-gradient(135deg, #124f80, #207c79)",
-              color: "#fff",
+              boxSizing: "border-box",
+              height: "40px",
+              border: "1px solid #b8b8b8",
+              borderRadius: "999px",
+              background: "transparent",
+              color: "#000",
               padding: "0 18px",
               fontWeight: 700,
-              minHeight: "46px",
               cursor: "pointer",
             }}
           >
@@ -186,10 +191,11 @@ export function TopicBrowser({ groups, mode = "home" }: TopicBrowserProps) {
           <p
             aria-live="polite"
             style={{
-              margin: "-2px 2px 0",
+              margin: "-2px 2px 0 auto",
               minHeight: "1.2em",
               color: isError ? "#b42318" : "var(--muted)",
               fontSize: "0.86rem",
+              textAlign: "right",
             }}
           >
             {feedback}

@@ -11,7 +11,7 @@ export default async function HomePage() {
   const dailyQuestion = await getDailyQuizPanelData(session?.user?.id ?? null);
 
   return (
-    <div style={{ display: "grid", gap: "28px" }}>
+    <div style={{ display: "grid", gap: "38px" }}>
       <HomeIntelligenceSection hotCluster={data.hotCluster} items={data.featuredCards} dailyQuestion={dailyQuestion} />
       <HomeDiscussionSection discussions={data.discussions} />
     </div>

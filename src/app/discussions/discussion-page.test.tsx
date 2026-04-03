@@ -10,6 +10,12 @@ vi.mock("next/headers", () => ({
   cookies: vi.fn(),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}));
+
 vi.mock("@/lib/db", () => ({
   prisma: {
     user: {
@@ -181,8 +187,7 @@ describe("Discussion pages", () => {
   it("renders the discussion list page", async () => {
     render(await DiscussionsPage());
 
-    expect(screen.getByRole("heading", { name: "讨论问答" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "为你推荐" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "精彩推荐" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "问题列表" })).toBeInTheDocument();
     expect(screen.getAllByText("测试问题一")).toHaveLength(2);
     expect(screen.getByText("测试问题二")).toBeInTheDocument();

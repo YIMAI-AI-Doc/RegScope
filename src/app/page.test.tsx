@@ -131,8 +131,8 @@ describe("HomePage", () => {
     expect(screen.getByRole("tab", { name: "热榜 top10" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "每日一题" })).toBeInTheDocument();
     expect(screen.getByText("热榜测试条目")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "精选讨论摘要" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "进入讨论问答" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "精选推荐" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "更多讨论问答" })).toBeInTheDocument();
     expect(screen.getAllByText("测试资讯卡片").length).toBeGreaterThan(0);
     expect(screen.getAllByText(/测试来源/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/1 小时前/).length).toBeGreaterThan(0);

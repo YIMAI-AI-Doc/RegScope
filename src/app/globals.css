@@ -105,7 +105,7 @@ a {
   display: flex;
   align-items: center;
   justify-self: start;
-  gap: 14px;
+  gap: 8px;
   color: inherit;
   text-decoration: none;
   transition: transform 160ms ease, opacity 160ms ease;
@@ -124,69 +124,63 @@ a {
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 14px 30px rgba(31, 79, 134, 0.22);
+  width: 58px;
+  height: 58px;
+  flex: 0 0 auto;
 }
 
-.brand-mark svg {
+.brand-mark-image {
   display: block;
   width: 100%;
   height: 100%;
+  object-fit: contain;
+  transform: translateY(-2px);
+  filter: drop-shadow(0 10px 18px rgba(23, 28, 35, 0.2));
 }
 
 .brand-copy {
   display: grid;
   align-content: center;
-  gap: 0;
+  gap: 2px;
 }
 
 .brand-name {
   margin: 0;
-  display: inline-block;
-  width: 8.4ch;
-  font-weight: 700;
-  letter-spacing: 0;
-  line-height: 1;
-  text-align: justify;
-  text-align-last: justify;
-}
-
-.brand-name::after {
-  content: "";
-  display: inline-block;
-  width: 100%;
+  font-size: clamp(1.22rem, 0.65vw + 0.92rem, 1.55rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 0.96;
+  white-space: nowrap;
+  color: #121212;
+  text-shadow: 0 1px 0 rgba(18, 18, 18, 0.14);
 }
 
 .brand-tag {
-  margin: -6px 0 0;
-  display: inline-block;
-  width: 8.4ch;
-  font-size: 0.96rem;
-  font-weight: 700;
-  font-style: italic;
-  letter-spacing: 0.02em;
-  line-height: 1;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  font-size: clamp(1.02rem, 0.56vw + 0.8rem, 1.42rem);
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: -0.03em;
+  line-height: 0.94;
+  white-space: nowrap;
   font-family:
     "Avenir Next",
-    "Trebuchet MS",
+    "Arial Black",
     "Segoe UI",
     sans-serif;
-  transform: none;
-  color: #2f69ab;
-  text-shadow: none;
+  color: #111111;
+  text-shadow: 0 1px 0 rgba(18, 18, 18, 0.14);
 }
 
-@supports ((-webkit-background-clip: text) or (background-clip: text)) {
-  .brand-tag {
-    background: none;
-    -webkit-background-clip: border-box;
-    background-clip: border-box;
-    color: #2f69ab;
-    -webkit-text-fill-color: #2f69ab;
-  }
+.brand-tag-accent {
+  color: #36b8d7;
+}
+
+.brand-tag-main {
+  color: #111111;
 }
 
 .brand-side-note {
@@ -418,6 +412,19 @@ a {
 
 .site-footer-logo-link {
   width: fit-content;
+}
+
+.site-footer-logo-link .brand-mark {
+  width: 68px;
+  height: 68px;
+}
+
+.site-footer-logo-link .brand-name {
+  font-size: clamp(1.34rem, 0.75vw + 1rem, 1.7rem);
+}
+
+.site-footer-logo-link .brand-tag {
+  font-size: clamp(1.12rem, 0.62vw + 0.88rem, 1.5rem);
 }
 
 .site-footer-description {
@@ -975,6 +982,57 @@ a {
   background: linear-gradient(135deg, #dc7b7b, #efadad);
 }
 
+.home-discussion-heading {
+  display: grid;
+  gap: 8px;
+  justify-content: start;
+}
+
+.home-discussion-heading-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.home-discussion-kicker {
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(31, 79, 134, 0.12), rgba(74, 156, 247, 0.14));
+  border: 1px solid rgba(31, 79, 134, 0.14);
+  color: var(--accent);
+  font-size: clamp(0.94rem, 1.7vw, 1.24rem);
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.home-discussion-title {
+  margin: 0;
+  font-size: clamp(0.94rem, 1.7vw, 1.24rem);
+  line-height: 1.15;
+  font-weight: 800;
+  color: #162334;
+  letter-spacing: 0.01em;
+}
+
+.home-discussion-accent {
+  width: 124px;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(31, 79, 134, 0.92), rgba(74, 156, 247, 0.3));
+}
+
+.home-discussion-link {
+  color: var(--accent);
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+  align-self: start;
+  padding-top: 6px;
+}
+
 .homepage-hot-item {
   display: block;
   padding: 5px 8px;
@@ -1244,6 +1302,23 @@ a {
 }
 
 @media (max-width: 720px) {
+  .brand {
+    gap: 10px;
+  }
+
+  .brand-mark {
+    width: 50px;
+    height: 50px;
+  }
+
+  .brand-name {
+    font-size: 1.08rem;
+  }
+
+  .brand-tag {
+    font-size: 0.98rem;
+  }
+
   .homepage-mixed-grid,
   .regscope-grid-five,
   .regscope-grid-three,

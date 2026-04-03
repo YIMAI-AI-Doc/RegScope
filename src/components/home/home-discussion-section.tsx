@@ -9,16 +9,15 @@ type HomeDiscussionSectionProps = {
 export function HomeDiscussionSection({ discussions }: HomeDiscussionSectionProps) {
   return (
     <section style={{ display: "grid", gap: "18px" }}>
-      <div style={{ display: "grid", gap: "10px" }}>
-        <div>
-          <p style={{ margin: 0, color: "var(--accent)", fontWeight: 700, letterSpacing: "0.08em" }}>讨论摘要</p>
-          <h2 style={{ margin: "4px 0 0", fontSize: "clamp(1.3rem, 2.2vw, 1.75rem)", lineHeight: 1.2 }}>
-            精选讨论摘要
-          </h2>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: "16px", alignItems: "center", flexWrap: "wrap" }}>
+        <div className="home-discussion-heading">
+          <div className="home-discussion-heading-row">
+            <p className="home-discussion-kicker">讨论问答</p>
+            <h2 className="home-discussion-title">精选推荐</h2>
+          </div>
+          <span className="home-discussion-accent" aria-hidden="true" />
         </div>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <Link href="/discussions" style={{ color: "var(--accent)", fontWeight: 700 }}>进入讨论问答</Link>
-        </div>
+        <Link href="/discussions" className="home-discussion-link">更多讨论问答</Link>
       </div>
 
       <div style={{ display: "grid", gap: "14px" }}>
