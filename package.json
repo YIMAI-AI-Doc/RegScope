@@ -14,7 +14,8 @@
     "test:e2e": "playwright test",
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
-    "ingest": "tsx scripts/run-ingest.ts"
+    "ingest": "tsx scripts/run-ingest.ts",
+    "quiz:import": "tsx scripts/import-quiz-questions.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

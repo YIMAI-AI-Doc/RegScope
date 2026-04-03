@@ -7,8 +7,8 @@ import { SiteHeader } from "@/components/layout/site-header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "药云纵观 | RegScope",
-  description: "药云纵观：全球医药监管情报平台",
+  title: "药宇纵观 | RegScope",
+  description: "药宇纵观：全球医药监管情报平台",
 };
 
 export default function RootLayout({

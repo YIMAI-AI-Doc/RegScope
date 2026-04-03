@@ -8,7 +8,7 @@ export function BrandIdentity() {
         <BrandMark />
       </span>
       <div className="brand-copy">
-        <p className="brand-name">药云纵观</p>
+        <p className="brand-name">药宇纵观</p>
         <p className="brand-tag">RegScope</p>
       </div>
     </>

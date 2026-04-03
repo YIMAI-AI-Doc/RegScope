@@ -2,6 +2,16 @@ import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
+vi.mock("next-auth", () => ({
+  getServerSession: vi.fn().mockResolvedValue({
+    user: { id: "user-1" },
+  }),
+}));
+
+vi.mock("@/lib/auth", () => ({
+  authOptions: {},
+}));
+
 vi.mock("@/lib/content/queries", () => ({
   getHomepageData: vi.fn().mockResolvedValue({
     alert: {
@@ -79,6 +89,33 @@ vi.mock("@/lib/content/queries", () => ({
   }),
 }));
 
+vi.mock("@/lib/quiz/queries", () => ({
+  getDailyQuizPanelData: vi.fn().mockResolvedValue({
+    dateKey: "2026-04-04",
+    dateLabel: "2026 年 4 月 4 日",
+    sequence: 1,
+    typeLabel: "单选题",
+    difficultyLabel: "简单",
+    prompt: "测试每日一题题干",
+    options: [
+      { key: "A", text: "选项 A" },
+      { key: "B", text: "选项 B" },
+      { key: "C", text: "选项 C" },
+      { key: "D", text: "选项 D" },
+    ],
+    allowsMultiple: false,
+    canAnswer: true,
+    loginRequired: false,
+    hasAnswered: false,
+    selectedOption: null,
+    isCorrect: null,
+    correctOption: null,
+    legalBasis: null,
+    explanation: null,
+    stats: null,
+  }),
+}));
+
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
@@ -91,7 +128,8 @@ describe("HomePage", () => {
   it("renders the approved homepage sections", async () => {
     render(await HomePage());
 
-    expect(screen.getByRole("heading", { name: /站内热榜 Top10/ })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "热榜 top10" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "每日一题" })).toBeInTheDocument();
     expect(screen.getByText("热榜测试条目")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "精选讨论摘要" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "进入讨论问答" })).toBeInTheDocument();
