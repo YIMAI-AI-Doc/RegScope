@@ -26,6 +26,17 @@ export function DailyQuestionPanel({ hotCluster, initialQuestion }: DailyQuestio
   const [isLoadingQuestion, setIsLoadingQuestion] = useState(false);
   const [isPending, startTransition] = useTransition();
 
+  useEffect(() => {
+    setQuestion(initialQuestion);
+    setSelectedOptions([]);
+    setError(null);
+  }, [
+    initialQuestion?.dateKey,
+    initialQuestion?.canAnswer,
+    initialQuestion?.hasAnswered,
+    initialQuestion?.selectedOption,
+  ]);
+
   function handleSelect(option: DailyQuizOptionKey) {
     if (!question || question.hasAnswered || !question.canAnswer || isPending) {
       return;
@@ -221,8 +232,10 @@ export function DailyQuestionPanel({ hotCluster, initialQuestion }: DailyQuestio
             </div>
           ) : null}
 
-          {!question.canAnswer && !question.hasAnswered ? (
-            <p className="daily-question-login-note">{question.statusNote ?? "登录后作答"}</p>
+          {!question.canAnswer && !question.hasAnswered && (question.loginRequired || question.statusNote) ? (
+            <p className="daily-question-login-note">
+              {question.loginRequired ? question.statusNote ?? "登录后作答" : question.statusNote}
+            </p>
           ) : null}
 
           {error ? <p className="daily-question-error">{error}</p> : null}
