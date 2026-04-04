@@ -5,6 +5,7 @@ import {
   FeedFormat,
   PrismaClient,
 } from "@prisma/client";
+import { petSpecies, petTiers } from "../src/lib/pets/catalog";
 
 const prisma = new PrismaClient();
 
@@ -627,6 +628,51 @@ const discussionSeeds: DiscussionSeed[] = [
 ];
 
 async function main() {
+  const petTierRecords = await Promise.all(
+    petTiers.map((tier) =>
+      prisma.petTier.upsert({
+        where: { slug: tier.slug },
+        update: {
+          name: tier.name,
+          sortOrder: tier.sortOrder,
+        },
+        create: {
+          slug: tier.slug,
+          name: tier.name,
+          sortOrder: tier.sortOrder,
+        },
+      }),
+    ),
+  );
+  const petTierMap = new Map(petTierRecords.map((tier) => [tier.slug, tier]));
+
+  await Promise.all(
+    petSpecies.map((item) =>
+      prisma.petSpecies.upsert({
+        where: { slug: item.slug },
+        update: {
+          name: item.name,
+          title: item.title,
+          tierId: petTierMap.get(item.tierSlug)?.id ?? "",
+          motionPreset: item.motionPreset,
+          visualStyle: item.visualStyle,
+          traitKeywords: [...item.traitKeywords],
+          growthStageConfig: item.growthStageConfig,
+        },
+        create: {
+          slug: item.slug,
+          name: item.name,
+          title: item.title,
+          tierId: petTierMap.get(item.tierSlug)?.id ?? "",
+          motionPreset: item.motionPreset,
+          visualStyle: item.visualStyle,
+          traitKeywords: [...item.traitKeywords],
+          growthStageConfig: item.growthStageConfig,
+        },
+      }),
+    ),
+  );
+
   const topTopicRecords = await Promise.all(
     topTopics.map((topic) =>
       prisma.topic.upsert({

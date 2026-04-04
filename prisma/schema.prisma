@@ -43,6 +43,27 @@ enum EvidenceLabel {
   UNVERIFIED
 }
 
+enum PetTierSlug {
+  FANZAI
+  MENGLING
+  ZHENCHONG
+  LINGZUN
+  SHENSHOU
+}
+
+enum PetGrowthStage {
+  BABY
+  GROWING
+  MATURE
+}
+
+enum PetEventType {
+  DAILY_QUESTION
+  COMMENT
+  ARTICLE
+  DISCUSSION_POST
+}
+
 model User {
   id           String        @id @default(cuid())
   email        String        @unique
@@ -60,6 +81,68 @@ model User {
   contentFavorites    ContentFavorite[]
   discussionFavorites DiscussionFavorite[]
   dailyQuizResponses  DailyQuizResponse[]
+  petProfile          UserPetProfile?
+  petEvents           UserPetEvent[]
+}
+
+model PetTier {
+  id        String       @id @default(cuid())
+  slug      PetTierSlug  @unique
+  name      String
+  sortOrder Int          @unique
+  species   PetSpecies[]
+  profiles  UserPetProfile[]
+}
+
+model PetSpecies {
+  id                String           @id @default(cuid())
+  slug              String           @unique
+  name              String
+  tierId            String
+  tier              PetTier          @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  motionPreset      String
+  visualStyle       String
+  title             String
+  traitKeywords     String[]
+  growthStageConfig Json
+  profiles          UserPetProfile[]
+}
+
+model UserPetProfile {
+  id                String          @id @default(cuid())
+  userId            String          @unique
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentTierId     String
+  currentTier       PetTier         @relation(fields: [currentTierId], references: [id], onDelete: Cascade)
+  currentSpeciesId  String
+  currentSpecies    PetSpecies      @relation(fields: [currentSpeciesId], references: [id], onDelete: Cascade)
+  currentPoints     Int             @default(0)
+  currentStage      PetGrowthStage  @default(BABY)
+  totalPointsEarned Int             @default(0)
+  lastUpgradeAt     DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  events            UserPetEvent[]
+
+  @@index([currentTierId])
+  @@index([currentSpeciesId])
+}
+
+model UserPetEvent {
+  id         String         @id @default(cuid())
+  userPetId  String
+  userPet    UserPetProfile @relation(fields: [userPetId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventType  PetEventType
+  points     Int
+  sourceId   String?
+  sourceType String?
+  createdAt  DateTime       @default(now())
+
+  @@index([userId, createdAt])
+  @@index([eventType, createdAt])
+  @@unique([userId, eventType, sourceId, sourceType])
 }
 
 model Country {
