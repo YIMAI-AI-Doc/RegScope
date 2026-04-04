@@ -41,5 +41,8 @@ describe("MyPetCard", () => {
     expect(screen.getByText("萌灵阶")).toBeInTheDocument();
     expect(screen.getByText("萨摩耶")).toBeInTheDocument();
     expect(screen.getByText("当前积分 9 / 15")).toBeInTheDocument();
+    expect(screen.queryByText("微笑云犬")).not.toBeInTheDocument();
+    expect(screen.queryByText("雪白蓬松，笑脸明显，云团般尾巴。")).not.toBeInTheDocument();
+    expect(screen.queryByText("微笑")).not.toBeInTheDocument();
   });
 });

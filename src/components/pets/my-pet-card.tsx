@@ -80,29 +80,7 @@ export function MyPetCard({
         />
 
         <div style={{ display: "grid", gap: compact ? "10px" : "12px", minWidth: 0 }}>
-          <div style={{ display: "grid", gap: "4px" }}>
-            <strong style={{ fontSize: compact ? "1rem" : "1.32rem", lineHeight: 1.15 }}>{pet.speciesName}</strong>
-            <span style={{ color: "var(--accent)", fontWeight: 700, fontSize: compact ? "0.88rem" : "0.94rem" }}>{pet.speciesTitle}</span>
-            <span style={{ color: "var(--muted)", fontSize: compact ? "0.8rem" : "0.88rem", lineHeight: 1.6 }}>{pet.visualStyle}</span>
-          </div>
-
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            {pet.traitKeywords.slice(0, compact ? 2 : 4).map((keyword) => (
-              <span
-                key={keyword}
-                style={{
-                  borderRadius: "999px",
-                  padding: compact ? "3px 8px" : "4px 10px",
-                  background: "rgba(31,79,134,0.08)",
-                  color: "var(--accent)",
-                  fontSize: compact ? "0.74rem" : "0.78rem",
-                  fontWeight: 700,
-                }}
-              >
-                {keyword}
-              </span>
-            ))}
-          </div>
+          <strong style={{ fontSize: compact ? "1rem" : "1.32rem", lineHeight: 1.15 }}>{pet.speciesName}</strong>
 
           <div style={{ display: "grid", gap: "10px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>

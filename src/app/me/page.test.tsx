@@ -102,6 +102,6 @@ describe("MePage", () => {
     expect(screen.getByText("我的神兽")).toBeInTheDocument();
     expect(screen.getByText("神兽图鉴与互动 >")).toBeInTheDocument();
     expect(screen.getByText("中华田园猫")).toBeInTheDocument();
-    expect(screen.getByText("本土守护喵")).toBeInTheDocument();
+    expect(screen.queryByText("本土守护喵")).not.toBeInTheDocument();
   });
 });
