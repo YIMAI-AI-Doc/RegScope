@@ -47,6 +47,10 @@ export function PetAvatarStage({ pet, compact = false }: PetAvatarStageProps) {
 }
 
 function renderSpecies(pet: PetAvatarStageProps["pet"]) {
+  if (pet.speciesSlug === "lop-rabbit" && pet.stage === "BABY") {
+    return renderBabyLopRabbit();
+  }
+
   switch (pet.speciesSlug) {
     case "goldfish":
       return renderFish(pet);
@@ -66,6 +70,36 @@ function renderSpecies(pet: PetAvatarStageProps["pet"]) {
     default:
       return renderQuadruped(pet);
   }
+}
+
+function renderBabyLopRabbit() {
+  return (
+    <>
+      <ellipse className="pet-ground-glow" cx="110" cy="152" rx="56" ry="13" />
+      <ellipse className="pet-body" cx="112" cy="112" rx="46" ry="36" />
+      <ellipse className="pet-head" cx="110" cy="82" rx="42" ry="34" />
+      <path className="pet-belly" d="M82 110 C 88 92 132 92 140 112 C 138 140 86 142 82 110 Z" />
+      <path className="pet-ear" d="M76 72 C 56 84 50 124 68 136 C 82 144 92 126 92 106 C 92 92 90 78 76 72 Z" />
+      <path className="pet-ear" d="M144 72 C 164 84 170 124 152 136 C 138 144 128 126 128 106 C 128 92 130 78 144 72 Z" />
+      <path className="pet-ear-inner" d="M78 86 C 66 94 64 118 74 126 C 82 132 88 118 88 104 C 88 96 86 90 78 86 Z" />
+      <path className="pet-ear-inner" d="M142 86 C 154 94 156 118 146 126 C 138 132 132 118 132 104 C 132 96 134 90 142 86 Z" />
+      <circle className="pet-cheek" cx="82" cy="94" r="10" />
+      <circle className="pet-cheek" cx="138" cy="94" r="10" />
+      <ellipse className="pet-eye" cx="94" cy="86" rx="5.8" ry="7.2" />
+      <ellipse className="pet-eye" cx="126" cy="86" rx="5.8" ry="7.2" />
+      <circle className="pet-eye-spark" cx="96" cy="83" r="1.8" />
+      <circle className="pet-eye-spark" cx="128" cy="83" r="1.8" />
+      <ellipse className="pet-nose" cx="110" cy="96" rx="5.6" ry="4.8" />
+      <path className="pet-mouth" d="M110 100 v7 M110 107 C 106 112 100 112 98 108 M110 107 C 114 112 120 112 122 108" />
+      <ellipse className="pet-rabbit-paw" cx="94" cy="116" rx="10" ry="14" transform="rotate(18 94 116)" />
+      <ellipse className="pet-rabbit-paw" cx="126" cy="116" rx="10" ry="14" transform="rotate(-18 126 116)" />
+      <path className="pet-rabbit-snack" d="M103 102 C 108 98 114 98 118 102 C 120 110 116 124 110 128 C 104 124 100 110 103 102 Z" />
+      <path className="pet-rabbit-snack-shell" d="M110 102 L110 128" />
+      <ellipse className="pet-foot" cx="90" cy="144" rx="10" ry="7" />
+      <ellipse className="pet-foot" cx="132" cy="144" rx="10" ry="7" />
+      <path className="pet-tail" d="M146 114 C 164 116 168 132 156 140" fill="none" stroke="var(--pet-accent)" strokeWidth="10" strokeLinecap="round" />
+    </>
+  );
 }
 
 function renderQuadruped(pet: PetAvatarStageProps["pet"]) {

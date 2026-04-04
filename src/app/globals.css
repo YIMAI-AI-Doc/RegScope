@@ -568,10 +568,39 @@ a {
   fill: var(--pet-body);
 }
 
+.pet-stage .pet-belly,
+.pet-stage .pet-rabbit-paw,
+.pet-stage .pet-foot {
+  fill: rgba(255, 251, 245, 0.96);
+}
+
 .pet-stage .pet-ear-accent,
 .pet-stage .pet-mark,
 .pet-stage .pet-beak {
   fill: var(--pet-accent);
+}
+
+.pet-stage .pet-ear-inner {
+  fill: rgba(255, 215, 207, 0.84);
+}
+
+.pet-stage .pet-cheek {
+  fill: rgba(255, 184, 145, 0.74);
+}
+
+.pet-stage .pet-eye-spark {
+  fill: rgba(255, 255, 255, 0.92);
+}
+
+.pet-stage .pet-nose {
+  fill: rgba(255, 202, 183, 0.9);
+}
+
+.pet-stage .pet-rabbit-snack {
+  fill: #5a3d2b;
+  stroke: #2d1d14;
+  stroke-width: 3;
+  stroke-linejoin: round;
 }
 
 .pet-stage .pet-tail,
@@ -579,7 +608,8 @@ a {
 .pet-stage .pet-horn,
 .pet-stage .pet-crest,
 .pet-stage .pet-dragon-body,
-.pet-stage .pet-snake {
+.pet-stage .pet-snake,
+.pet-stage .pet-rabbit-snack-shell {
   stroke: var(--pet-accent);
 }
 
