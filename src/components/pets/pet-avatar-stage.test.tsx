@@ -43,7 +43,7 @@ describe("PetAvatarStage", () => {
     expect(root).toHaveClass("pet-stage", "motion-swim", "stage-mature", "is-compact");
   });
 
-  it("renders ornaments from the growth stage and adds one more for shenshou tier", () => {
+  it("does not render the retired ornament decoration for shenshou tier", () => {
     const { container } = render(
       <PetAvatarStage
         pet={{
@@ -57,6 +57,10 @@ describe("PetAvatarStage", () => {
       />,
     );
 
-    expect(container.querySelectorAll(".pet-ornament")).toHaveLength(4);
+    const root = screen.getByTestId("pet-stage-root");
+
+    expect(root).toHaveClass("tier-shenshou");
+    expect(container.querySelector(".pet-stage-ornaments")).toBeNull();
+    expect(container.querySelector(".pet-ornament")).toBeNull();
   });
 });

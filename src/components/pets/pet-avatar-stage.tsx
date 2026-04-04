@@ -20,7 +20,6 @@ type PetAvatarStageProps = {
 export function PetAvatarStage({ pet, compact = false }: PetAvatarStageProps) {
   const stageVisual = pet.growthStageConfig[pet.stage];
   const sizeClass = compact ? "is-compact" : "";
-  const ornamentCount = stageVisual.ornamentLevel + (pet.tierSlug === "SHENSHOU" ? 1 : 0);
 
   return (
     <div
@@ -38,11 +37,6 @@ export function PetAvatarStage({ pet, compact = false }: PetAvatarStageProps) {
       }
     >
       <div className="pet-stage-aura" aria-hidden="true" />
-      <div className="pet-stage-ornaments" aria-hidden="true">
-        {Array.from({ length: ornamentCount }).map((_, index) => (
-          <span key={index} className={`pet-ornament pet-ornament-${(index % 3) + 1}`} />
-        ))}
-      </div>
       <svg className="pet-stage-svg" viewBox="0 0 220 180" aria-hidden="true">
         <g className="pet-stage-figure">
           {renderSpecies(pet)}

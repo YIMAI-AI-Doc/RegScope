@@ -554,32 +554,6 @@ a {
   opacity: 0.68;
 }
 
-.pet-stage-ornaments {
-  position: absolute;
-  inset: 12px 14px auto auto;
-  z-index: 1;
-  display: flex;
-  gap: 6px;
-}
-
-.pet-ornament {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(255, 191, 77, 0.78);
-  box-shadow: 0 0 0 4px rgba(255, 191, 77, 0.14);
-}
-
-.pet-ornament-2 {
-  background: rgba(101, 164, 226, 0.78);
-  box-shadow: 0 0 0 4px rgba(101, 164, 226, 0.14);
-}
-
-.pet-ornament-3 {
-  background: rgba(120, 210, 188, 0.82);
-  box-shadow: 0 0 0 4px rgba(120, 210, 188, 0.14);
-}
-
 .pet-stage .pet-ground-glow {
   fill: rgba(31, 79, 134, 0.08);
 }
