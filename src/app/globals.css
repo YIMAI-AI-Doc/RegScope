@@ -500,6 +500,231 @@ a {
   margin: 0;
 }
 
+.pet-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 156px;
+  border-radius: 22px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 54%),
+    linear-gradient(180deg, rgba(228, 240, 250, 0.92), rgba(243, 247, 252, 0.96));
+  border: 1px solid rgba(104, 132, 171, 0.14);
+}
+
+.pet-stage.is-compact {
+  min-height: 108px;
+  border-radius: 18px;
+}
+
+.pet-stage-svg {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 220px);
+  height: auto;
+}
+
+.pet-stage-figure {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transform: translateY(4px) scale(var(--pet-scale, 1));
+  animation: petFloat 3.6s ease-in-out infinite;
+}
+
+.pet-stage.is-compact .pet-stage-svg {
+  width: min(100%, 160px);
+}
+
+.pet-stage-aura {
+  position: absolute;
+  inset: auto 18px 18px;
+  height: 66px;
+  border-radius: 999px;
+  background: radial-gradient(circle, var(--pet-aura) 0%, rgba(255, 255, 255, 0) 72%);
+  opacity: 0.88;
+  filter: blur(12px);
+}
+
+.pet-stage.stage-baby .pet-stage-aura {
+  opacity: 0.4;
+}
+
+.pet-stage.stage-growing .pet-stage-aura {
+  opacity: 0.68;
+}
+
+.pet-stage-ornaments {
+  position: absolute;
+  inset: 12px 14px auto auto;
+  z-index: 1;
+  display: flex;
+  gap: 6px;
+}
+
+.pet-ornament {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 191, 77, 0.78);
+  box-shadow: 0 0 0 4px rgba(255, 191, 77, 0.14);
+}
+
+.pet-ornament-2 {
+  background: rgba(101, 164, 226, 0.78);
+  box-shadow: 0 0 0 4px rgba(101, 164, 226, 0.14);
+}
+
+.pet-ornament-3 {
+  background: rgba(120, 210, 188, 0.82);
+  box-shadow: 0 0 0 4px rgba(120, 210, 188, 0.14);
+}
+
+.pet-stage .pet-ground-glow {
+  fill: rgba(31, 79, 134, 0.08);
+}
+
+.pet-stage .pet-body,
+.pet-stage .pet-head,
+.pet-stage .pet-ear,
+.pet-stage .pet-fin,
+.pet-stage .pet-wing,
+.pet-stage .pet-leg,
+.pet-stage .pet-shell {
+  fill: var(--pet-body);
+}
+
+.pet-stage .pet-ear-accent,
+.pet-stage .pet-mark,
+.pet-stage .pet-beak {
+  fill: var(--pet-accent);
+}
+
+.pet-stage .pet-tail,
+.pet-stage .pet-mouth,
+.pet-stage .pet-horn,
+.pet-stage .pet-crest,
+.pet-stage .pet-dragon-body,
+.pet-stage .pet-snake {
+  stroke: var(--pet-accent);
+}
+
+.pet-stage .pet-dragon-body {
+  fill: none;
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pet-stage .pet-mouth,
+.pet-stage .pet-horn,
+.pet-stage .pet-crest,
+.pet-stage .pet-snake,
+.pet-stage .pet-mark {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pet-stage .pet-eye {
+  fill: #183a59;
+}
+
+.pet-stage .pet-bubble {
+  fill: rgba(255, 255, 255, 0.88);
+  stroke: rgba(101, 164, 226, 0.4);
+}
+
+.pet-stage.motion-wag .pet-tail,
+.pet-stage.motion-curl .pet-tail,
+.pet-stage.motion-orbit .pet-tail {
+  animation: petTailWag 1.6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.pet-stage.motion-swim .pet-fin,
+.pet-stage.motion-glide .pet-wing,
+.pet-stage.motion-wingbeat .pet-wing,
+.pet-stage.motion-soar .pet-wing {
+  animation: petWingDrift 2.2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.pet-stage.motion-hop .pet-stage-figure,
+.pet-stage.motion-pounce .pet-stage-figure,
+.pet-stage.motion-stride .pet-stage-figure {
+  animation: petHop 2.4s ease-in-out infinite;
+}
+
+.pet-stage.motion-ripple .pet-stage-aura {
+  animation: petAuraPulse 2.6s ease-in-out infinite;
+}
+
+.pet-stage.tier-shenshou {
+  background:
+    radial-gradient(circle at top left, rgba(255, 191, 77, 0.22), transparent 30%),
+    radial-gradient(circle at top right, rgba(94, 169, 233, 0.24), transparent 26%),
+    linear-gradient(180deg, rgba(253, 249, 238, 0.98), rgba(240, 247, 255, 0.96));
+}
+
+@keyframes petFloat {
+  0%,
+  100% {
+    transform: translateY(4px) scale(var(--pet-scale, 1));
+  }
+
+  50% {
+    transform: translateY(-2px) scale(var(--pet-scale, 1));
+  }
+}
+
+@keyframes petTailWag {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes petWingDrift {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  50% {
+    transform: scaleY(0.9);
+  }
+}
+
+@keyframes petHop {
+  0%,
+  100% {
+    transform: translateY(4px) scale(var(--pet-scale, 1));
+  }
+
+  50% {
+    transform: translateY(-8px) scale(var(--pet-scale, 1));
+  }
+}
+
+@keyframes petAuraPulse {
+  0%,
+  100% {
+    transform: scale(0.94);
+    opacity: 0.72;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
 .intelligence-card {
   position: relative;
 }
