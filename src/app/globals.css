@@ -618,6 +618,78 @@ a {
   overflow: hidden;
 }
 
+.homepage-intelligence-section {
+  position: relative;
+  display: grid;
+  gap: 12px;
+}
+
+.homepage-intelligence-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.homepage-refresh-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  border: 1px solid rgba(166, 186, 204, 0.42);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(241, 247, 252, 0.96));
+  color: #355372;
+  padding: 0 14px 0 12px;
+  box-shadow: 0 10px 24px rgba(120, 148, 170, 0.12);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.homepage-refresh-button svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 220ms ease;
+}
+
+.homepage-refresh-button:hover,
+.homepage-refresh-button:focus-visible {
+  transform: translateY(-1px);
+  color: #163f68;
+  border-color: rgba(104, 133, 163, 0.4);
+  box-shadow: 0 14px 26px rgba(120, 148, 170, 0.16);
+}
+
+.homepage-refresh-button:hover svg,
+.homepage-refresh-button:focus-visible svg {
+  transform: rotate(160deg);
+}
+
+.homepage-refresh-button:focus-visible {
+  outline: 2px solid rgba(47, 106, 168, 0.28);
+  outline-offset: 2px;
+}
+
+.homepage-intelligence-slot {
+  animation: homepageCardSwapIn 220ms ease both;
+}
+
+@keyframes homepageCardSwapIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .homepage-mixed-grid {
   --homepage-intel-card-height: clamp(246px, 24vw, 272px);
   --homepage-mixed-grid-gap: 24px;

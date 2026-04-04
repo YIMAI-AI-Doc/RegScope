@@ -26,6 +26,7 @@ type AccountMenuProps = {
 export function AccountMenu({ viewer, stats }: AccountMenuProps) {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const hoverCloseTimerRef = useRef<number | null>(null);
   const [stickyOpen, setStickyOpen] = useState(false);
   const [hoverOpen, setHoverOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "mist">("light");
@@ -43,6 +44,10 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
     function handlePointerDown(event: MouseEvent) {
       if (!containerRef.current) return;
       if (!containerRef.current.contains(event.target as Node)) {
+        if (hoverCloseTimerRef.current) {
+          window.clearTimeout(hoverCloseTimerRef.current);
+          hoverCloseTimerRef.current = null;
+        }
         setStickyOpen(false);
         setHoverOpen(false);
       }
@@ -57,6 +62,34 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
     setTheme(nextTheme);
     applyTheme(nextTheme);
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (hoverCloseTimerRef.current) {
+        window.clearTimeout(hoverCloseTimerRef.current);
+      }
+    };
+  }, []);
+
+  function openHoverPanel() {
+    if (hoverCloseTimerRef.current) {
+      window.clearTimeout(hoverCloseTimerRef.current);
+      hoverCloseTimerRef.current = null;
+    }
+
+    setHoverOpen(true);
+  }
+
+  function closeHoverPanelWithDelay() {
+    if (hoverCloseTimerRef.current) {
+      window.clearTimeout(hoverCloseTimerRef.current);
+    }
+
+    hoverCloseTimerRef.current = window.setTimeout(() => {
+      setHoverOpen(false);
+      hoverCloseTimerRef.current = null;
+    }, 300);
+  }
 
   async function handleLogin(event: React.FormEvent) {
     event.preventDefault();
@@ -104,8 +137,8 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
       className="account-menu"
       data-open={isOpen ? "true" : "false"}
       style={{ position: "relative", display: "inline-flex", alignItems: "center" }}
-      onMouseEnter={() => setHoverOpen(true)}
-      onMouseLeave={() => setHoverOpen(false)}
+      onMouseEnter={openHoverPanel}
+      onMouseLeave={closeHoverPanelWithDelay}
     >
       <span className="account-touchpad" aria-hidden="true" />
       <button
@@ -168,7 +201,6 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
               padding: "18px 18px 14px",
               background:
                 "radial-gradient(circle at 18% 10%, rgba(47,106,168,0.22), transparent 52%), radial-gradient(circle at 86% 0%, rgba(31,79,134,0.16), transparent 48%), linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.72))",
-              borderBottom: "1px solid rgba(104, 132, 171, 0.18)",
             }}
           >
             <div style={{ display: "flex", gap: "14px", alignItems: "center" }}>
@@ -216,7 +248,7 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginTop: "14px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px", marginTop: "14px" }}>
               <Stat
                 label="关注"
                 value={stats.followCount}
@@ -231,7 +263,9 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
             </div>
           </div>
 
-          <div style={{ padding: "14px 18px", display: "grid", gap: "12px" }}>
+          <div style={{ borderTop: "1px solid rgba(104, 132, 171, 0.18)", margin: "0 18px" }} />
+
+          <div style={{ padding: "8px 18px 14px", display: "grid", gap: "12px" }}>
             {error ? <p style={{ margin: 0, color: "#b43a33", lineHeight: 1.6 }}>{error}</p> : null}
 
             {!viewer.isAuthenticated ? (
@@ -270,9 +304,20 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
               null
             )}
 
-            <div style={{ borderTop: "1px solid rgba(104, 132, 171, 0.18)" }} />
-
             <div style={{ display: "grid", gap: "6px" }}>
+              {viewer.isAuthenticated ? (
+                <MenuRow
+                  label="我的神兽"
+                  hint="神兽图鉴与互动"
+                  trailing=">"
+                  tall
+                  onActivate={() => {
+                    setStickyOpen(false);
+                    setHoverOpen(false);
+                    router.push("/me");
+                  }}
+                />
+              ) : null}
               {viewer.isAuthenticated ? (
                 <MenuRow
                   label="个人中心"
@@ -334,7 +379,12 @@ function Stat({
   ariaLabel?: string;
 }) {
   const [focused, setFocused] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const interactive = Boolean(onActivate);
+  const isActive = hovered || focused;
+  const highlightColor = "#0057b8";
+  const valueColor = isActive ? highlightColor : "#687a95";
+  const labelColor = isActive ? highlightColor : "#8a97ab";
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     if (!interactive) return;
@@ -353,21 +403,41 @@ function Stat({
       onKeyDown={handleKeyDown}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        borderRadius: "14px",
-        border: "1px solid rgba(104, 132, 171, 0.18)",
-        background: "rgba(255,255,255,0.70)",
-        padding: "10px 10px",
+        padding: "6px 8px",
         textAlign: "center",
         display: "grid",
         gap: "2px",
         cursor: interactive ? "pointer" : "default",
-        boxShadow: focused ? "0 0 0 3px rgba(47, 106, 168, 0.22)" : "none",
-        transition: "box-shadow 0.12s ease, transform 0.08s ease",
+        borderRadius: "10px",
+        color: valueColor,
+        background: "transparent",
+        boxShadow: "none",
+        transition: "color 0.12s ease, transform 0.12s ease",
+        transform: isActive ? "translateY(-1px)" : "translateY(0)",
       }}
     >
-      <strong style={{ fontSize: "1.05rem" }}>{value}</strong>
-      <span style={{ color: "var(--muted)", fontSize: "0.84rem" }}>{label}</span>
+      <strong
+        style={{
+          fontSize: "1.05rem",
+          color: valueColor,
+          transition: "color 0.12s ease, transform 0.12s ease",
+          transform: isActive ? "scale(1.08)" : "scale(1)",
+        }}
+      >
+        {value}
+      </strong>
+      <span
+        style={{
+          color: labelColor,
+          fontSize: "0.84rem",
+          transition: "color 0.12s ease",
+        }}
+      >
+        {label}
+      </span>
     </div>
   );
 }
@@ -377,11 +447,13 @@ function MenuRow({
   hint,
   trailing,
   onActivate,
+  tall,
 }: {
   label: string;
   hint: string;
   trailing: string;
   onActivate?: () => void;
+  tall?: boolean;
 }) {
   return (
     <div
@@ -400,7 +472,8 @@ function MenuRow({
         alignItems: "center",
         justifyContent: "space-between",
         gap: "12px",
-        padding: "10px 10px",
+        padding: tall ? "20px 10px" : "10px 10px",
+        minHeight: tall ? "72px" : undefined,
         borderRadius: "14px",
         border: "1px solid rgba(104, 132, 171, 0.14)",
         background: "rgba(31,79,134,0.02)",
