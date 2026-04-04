@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getAuthSecret } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { evidenceLabelValues } from "@/lib/discussions/status";
+import { grantPetPoints } from "@/lib/pets/grant-points";
 
 const createAnswerSchema = z.object({
   body: z.string().min(8),
@@ -72,6 +73,17 @@ export async function POST(request: NextRequest, { params }: Params) {
       evidenceLabel: parsed.data.evidenceLabel ?? "UNVERIFIED",
     },
   });
+
+  try {
+    await grantPetPoints({
+      userId: user.id,
+      eventType: "COMMENT",
+      sourceId: answer.id,
+      sourceType: "ANSWER",
+    });
+  } catch (petError) {
+    console.error("Failed to grant divine beast points after answer creation", petError);
+  }
 
   return NextResponse.json(
     {

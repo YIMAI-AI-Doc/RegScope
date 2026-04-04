@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getAuthSecret } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { canEditCanonicalConclusion, discussionStatusValues, evidenceLabelValues } from "@/lib/discussions/status";
+import { grantPetPoints } from "@/lib/pets/grant-points";
 
 const createDiscussionSchema = z.object({
   title: z.string().min(8),
@@ -127,6 +128,17 @@ export async function POST(request: NextRequest) {
         : undefined,
     },
   });
+
+  try {
+    await grantPetPoints({
+      userId: user.id,
+      eventType: "DISCUSSION_POST",
+      sourceId: discussion.id,
+      sourceType: "DISCUSSION",
+    });
+  } catch (petError) {
+    console.error("Failed to grant divine beast points after discussion creation", petError);
+  }
 
   return NextResponse.json(
     {

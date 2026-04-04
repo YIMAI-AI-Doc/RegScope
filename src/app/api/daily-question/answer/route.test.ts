@@ -13,12 +13,18 @@ vi.mock("@/lib/quiz/queries", () => ({
   submitDailyQuizAnswer: vi.fn(),
 }));
 
+vi.mock("@/lib/pets/grant-points", () => ({
+  grantPetPoints: vi.fn(),
+}));
+
 import { getServerSession } from "next-auth";
+import { grantPetPoints } from "@/lib/pets/grant-points";
 import { submitDailyQuizAnswer } from "@/lib/quiz/queries";
 import { POST } from "./route";
 
 const mockedGetServerSession = vi.mocked(getServerSession);
 const mockedSubmitDailyQuizAnswer = vi.mocked(submitDailyQuizAnswer);
+const mockedGrantPetPoints = vi.mocked(grantPetPoints);
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -82,5 +88,11 @@ describe("daily question answer route", () => {
 
     expect(response.status).toBe(200);
     expect(mockedSubmitDailyQuizAnswer).toHaveBeenCalledWith("user-1", ["B"]);
+    expect(mockedGrantPetPoints).toHaveBeenCalledWith({
+      userId: "user-1",
+      eventType: "DAILY_QUESTION",
+      sourceId: "2026-04-04",
+      sourceType: "DAILY_QUESTION",
+    });
   });
 });

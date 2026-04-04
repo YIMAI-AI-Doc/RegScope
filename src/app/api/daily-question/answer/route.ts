@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { grantPetPoints } from "@/lib/pets/grant-points";
 import { submitDailyQuizAnswer } from "@/lib/quiz/queries";
 
+// TODO(divine-beast): Wire ARTICLE +3 to a dedicated user-authored article publishing route when RegScope adds one.
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
@@ -18,6 +20,18 @@ export async function POST(request: NextRequest) {
 
   try {
     const result = await submitDailyQuizAnswer(session.user.id, selection);
+
+    try {
+      await grantPetPoints({
+        userId: session.user.id,
+        eventType: "DAILY_QUESTION",
+        sourceId: result.dateKey,
+        sourceType: "DAILY_QUESTION",
+      });
+    } catch (petError) {
+      console.error("Failed to grant divine beast points after daily question answer", petError);
+    }
+
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
     if (error instanceof Error) {
