@@ -1,9 +1,11 @@
 import React from "react";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { MyPetCard } from "@/components/pets/my-pet-card";
 import { ProfileAvatarCard } from "@/components/profile/profile-avatar-card";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getCurrentUserPetCardData } from "@/lib/pets/queries";
 
 export const metadata = {
   title: "个人中心 | RegScope",
@@ -18,10 +20,11 @@ export default async function MePage() {
     redirect("/api/auth/signin");
   }
 
-  const [profile, stats, favorites] = await Promise.all([
+  const [profile, stats, favorites, pet] = await Promise.all([
     getProfileSummary(viewer.id),
     getProfileStats(viewer.id),
     getFavorites(viewer.id),
+    getCurrentUserPetCardData(viewer.id),
   ]);
 
   return (
@@ -30,6 +33,13 @@ export default async function MePage() {
         name={profile.name ?? viewer.name ?? viewer.email ?? ""}
         email={profile.email ?? viewer.email ?? ""}
         avatarUrl={profile.avatarUrl}
+      />
+
+      <MyPetCard
+        pet={pet}
+        href="/me/pets"
+        title="我的神兽"
+        subtitle="你的班宠会随答题、讨论与互动持续成长"
       />
 
       <section

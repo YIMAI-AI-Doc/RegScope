@@ -41,6 +41,31 @@ describe("AccountMenu", () => {
           answerCount: 3,
           discussionCount: 5,
         }}
+        petSummary={{
+          tierSlug: "FANZAI",
+          tierName: "凡崽",
+          tierFlavor: "凡间萌崽，亲近、圆润、新手友好。",
+          speciesSlug: "garden-cat",
+          speciesName: "中华田园猫",
+          speciesTitle: "本土守护喵",
+          family: "feline",
+          motionPreset: "pounce",
+          visualStyle: "圆脸奶猫，暖色毛流和大眼睛。",
+          traitKeywords: ["奶猫", "圆脸"],
+          colors: { body: "#f0b778", accent: "#9f5324", aura: "#f6e4cc" },
+          growthStageConfig: {
+            BABY: { scale: 0.82, ornamentLevel: 1, aura: "none" },
+            GROWING: { scale: 0.94, ornamentLevel: 2, aura: "soft" },
+            MATURE: { scale: 1.06, ornamentLevel: 3, aura: "radiant" },
+          },
+          currentPoints: 4,
+          totalRequiredPoints: 15,
+          stage: "BABY",
+          starFill: [0.8, 0, 0],
+          nextTierName: "萌灵",
+          pointsRemaining: 11,
+          isMaxTier: false,
+        }}
       />,
     );
 
@@ -49,6 +74,8 @@ describe("AccountMenu", () => {
 
     fireEvent.mouseEnter(wrapper!);
     expect(screen.getByRole("menu", { name: "账户面板" })).toBeInTheDocument();
+    expect(screen.getByText("我的神兽")).toBeInTheDocument();
+    expect(screen.getByText("当前积分 4 / 15")).toBeInTheDocument();
 
     fireEvent.mouseLeave(wrapper!);
     act(() => {

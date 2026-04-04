@@ -3,6 +3,8 @@
 import React, { useEffect, useMemo, useRef, useState, startTransition } from "react";
 import { useRouter } from "next/navigation";
 import { signIn, signOut } from "next-auth/react";
+import { MyPetCard } from "@/components/pets/my-pet-card";
+import type { CurrentUserPetCardData } from "@/lib/pets/queries";
 
 export type AccountMenuViewer = {
   isAuthenticated: boolean;
@@ -21,9 +23,10 @@ export type AccountMenuStats = {
 type AccountMenuProps = {
   viewer: AccountMenuViewer;
   stats: AccountMenuStats;
+  petSummary?: CurrentUserPetCardData | null;
 };
 
-export function AccountMenu({ viewer, stats }: AccountMenuProps) {
+export function AccountMenu({ viewer, stats, petSummary = null }: AccountMenuProps) {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const hoverCloseTimerRef = useRef<number | null>(null);
@@ -305,18 +308,33 @@ export function AccountMenu({ viewer, stats }: AccountMenuProps) {
             )}
 
             <div style={{ display: "grid", gap: "6px" }}>
-              {viewer.isAuthenticated ? (
-                <MenuRow
-                  label="我的神兽"
-                  hint="神兽图鉴与互动"
-                  trailing=">"
-                  tall
-                  onActivate={() => {
+              {viewer.isAuthenticated && petSummary ? (
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
                     setStickyOpen(false);
                     setHoverOpen(false);
-                    router.push("/me");
+                    router.push("/me/pets");
                   }}
-                />
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      setStickyOpen(false);
+                      setHoverOpen(false);
+                      router.push("/me/pets");
+                    }
+                  }}
+                  style={{
+                    cursor: "pointer",
+                  }}
+                >
+                  <MyPetCard
+                    pet={petSummary}
+                    compact
+                    subtitle="神兽图鉴与互动"
+                  />
+                </div>
               ) : null}
               {viewer.isAuthenticated ? (
                 <MenuRow
@@ -447,13 +465,11 @@ function MenuRow({
   hint,
   trailing,
   onActivate,
-  tall,
 }: {
   label: string;
   hint: string;
   trailing: string;
   onActivate?: () => void;
-  tall?: boolean;
 }) {
   return (
     <div
@@ -472,8 +488,7 @@ function MenuRow({
         alignItems: "center",
         justifyContent: "space-between",
         gap: "12px",
-        padding: tall ? "20px 10px" : "10px 10px",
-        minHeight: tall ? "72px" : undefined,
+        padding: "10px 10px",
         borderRadius: "14px",
         border: "1px solid rgba(104, 132, 171, 0.14)",
         background: "rgba(31,79,134,0.02)",

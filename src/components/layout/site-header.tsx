@@ -7,6 +7,7 @@ import { SiteGlobalSearch } from "@/components/layout/site-global-search";
 import { TopnavLinks } from "@/components/layout/topnav-links";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getCurrentUserPetCardData } from "@/lib/pets/queries";
 
 const navItems = [
   { href: "/", label: "首页" },
@@ -34,7 +35,7 @@ export async function SiteHeader() {
         avatarUrl: null,
         userId: null as string | null,
       };
-  const [latestProfile, stats] = viewerSession.isAuthenticated
+  const [latestProfile, stats, petSummary] = viewerSession.isAuthenticated
     ? await Promise.all([
         prisma.user.findUnique({
           where: { id: viewerSession.userId ?? "" },
@@ -45,8 +46,9 @@ export async function SiteHeader() {
           prisma.answer.count({ where: { authorId: viewerSession.userId ?? "" } }),
           prisma.discussion.count({ where: { createdById: viewerSession.userId ?? "" } }),
         ]),
+        getCurrentUserPetCardData(viewerSession.userId ?? ""),
       ])
-    : [null, [0, 0, 0] as const];
+    : [null, [0, 0, 0] as const, null];
 
   const viewer = {
     ...viewerSession,
@@ -79,6 +81,7 @@ export async function SiteHeader() {
             answerCount: stats[1],
             discussionCount: stats[2],
           }}
+          petSummary={petSummary}
         />
       </nav>
     </header>
