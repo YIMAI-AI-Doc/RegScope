@@ -6,10 +6,10 @@ export function BrandIdentity() {
     <>
       <span className="brand-mark">
         <Image
-          src="/brand-mark-blackbar.png"
+          src="/new-logo-icon.png"
           alt=""
-          width={512}
-          height={512}
+          width={3881}
+          height={3743}
           className="brand-mark-image"
         />
       </span>

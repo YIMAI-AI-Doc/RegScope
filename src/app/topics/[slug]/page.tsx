@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SourceCard } from "@/components/cards/source-card";
 import { TopicCard } from "@/components/cards/topic-card";
+import { BackToTopButton } from "@/components/layout/back-to-top-button";
 import { getTopicPageData } from "@/lib/content/queries";
 
 export const metadata: Metadata = {
@@ -83,6 +84,8 @@ export default async function TopicDetailPage({ params }: TopicPageProps) {
         <h2 style={{ margin: 0 }}>相关讨论</h2>
         <p style={{ margin: 0, color: "var(--muted)" }}>暂无讨论，欢迎在讨论区发起该话题。</p>
       </section>
+
+      <BackToTopButton />
     </div>
   );
 }

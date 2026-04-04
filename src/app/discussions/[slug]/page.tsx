@@ -7,6 +7,7 @@ import { EvidenceList } from "@/components/discussions/evidence-list";
 import { ControversyPanel } from "@/components/discussions/controversy-panel";
 import { AnswerList } from "@/components/discussions/answer-list";
 import { DiscussionViewTracker } from "@/components/discussions/view-tracker";
+import { BackToTopButton } from "@/components/layout/back-to-top-button";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getDiscussionPageData } from "@/lib/discussions/queries";
@@ -153,6 +154,8 @@ export default async function DiscussionDetailPage({ params }: DiscussionDetailP
           </div>
         </section>
       ) : null}
+
+      <BackToTopButton />
     </div>
   );
 }

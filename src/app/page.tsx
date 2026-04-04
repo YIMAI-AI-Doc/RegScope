@@ -1,4 +1,5 @@
 import React from "react";
+import { BackToTopButton } from "@/components/layout/back-to-top-button";
 import { getServerSession } from "next-auth";
 import { HomeDiscussionSection } from "@/components/home/home-discussion-section";
 import { HomeIntelligenceSection } from "@/components/home/home-intelligence-section";
@@ -14,6 +15,7 @@ export default async function HomePage() {
     <div style={{ display: "grid", gap: "38px" }}>
       <HomeIntelligenceSection hotCluster={data.hotCluster} items={data.featuredCards} dailyQuestion={dailyQuestion} />
       <HomeDiscussionSection discussions={data.discussions} />
+      <BackToTopButton />
     </div>
   );
 }

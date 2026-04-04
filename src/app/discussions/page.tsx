@@ -4,6 +4,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { getServerSession } from "next-auth";
 import { DiscussionCard } from "@/components/cards/discussion-card";
+import { BackToTopButton } from "@/components/layout/back-to-top-button";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { DISCUSSION_HISTORY_COOKIE, parseDiscussionHistory } from "@/lib/discussions/history";
@@ -117,6 +118,8 @@ export default async function DiscussionsPage() {
           ))}
         </div>
       </section>
+
+      <BackToTopButton />
     </div>
   );
 }

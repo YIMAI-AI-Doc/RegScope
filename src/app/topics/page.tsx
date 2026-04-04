@@ -1,5 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
+import { BackToTopButton } from "@/components/layout/back-to-top-button";
 import { TopicBrowser } from "@/components/topics/topic-browser";
 import { getTopicDirectoryData } from "@/lib/content/queries";
 
@@ -14,6 +15,7 @@ export default async function TopicsPage() {
   return (
     <div style={{ display: "grid", gap: "24px" }}>
       <TopicBrowser groups={data.topicGroups} mode="directory" />
+      <BackToTopButton />
     </div>
   );
 }

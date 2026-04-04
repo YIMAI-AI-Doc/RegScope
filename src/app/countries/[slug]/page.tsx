@@ -4,6 +4,7 @@ import Link from "next/link";
 import { IntelligenceCard } from "@/components/cards/intelligence-card";
 import { SourceCard } from "@/components/cards/source-card";
 import { TopicCard } from "@/components/cards/topic-card";
+import { BackToTopButton } from "@/components/layout/back-to-top-button";
 import { getCountryPageData } from "@/lib/content/queries";
 
 export const metadata: Metadata = {
@@ -107,6 +108,8 @@ export default async function CountryDetailPage({ params }: CountryPageProps) {
           <DiscussionDigestCard key={discussion.slug} {...discussion} />
         ))}
       </section>
+
+      <BackToTopButton />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { IntelligenceCard } from "@/components/cards/intelligence-card";
 import { TopicCard } from "@/components/cards/topic-card";
 import { FeedFilterDrawer } from "@/components/filters/feed-filter-drawer";
 import { AccountCard } from "@/components/home/account-card";
+import { BackToTopButton } from "@/components/layout/back-to-top-button";
 import { SearchResultsHeader } from "@/components/search/search-results-header";
 import {
   getFeedPageData,
@@ -152,6 +153,8 @@ export default async function FeedPage({ searchParams }: FeedPageProps) {
           )}
         </ResultSection>
       ) : null}
+
+      <BackToTopButton />
     </div>
   );
 }

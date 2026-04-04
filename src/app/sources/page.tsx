@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { IntelligenceCard } from "@/components/cards/intelligence-card";
 import { SourceCard } from "@/components/cards/source-card";
+import { BackToTopButton } from "@/components/layout/back-to-top-button";
 import { getSourceDirectoryData } from "@/lib/content/queries";
 
 export const metadata: Metadata = {
@@ -53,6 +54,8 @@ export default async function SourcesPage() {
           <DiscussionDigestCard key={discussion.slug} {...discussion} />
         ))}
       </section>
+
+      <BackToTopButton />
     </div>
   );
 }

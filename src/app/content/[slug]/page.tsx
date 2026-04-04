@@ -2,6 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { IntelligenceCard } from "@/components/cards/intelligence-card";
+import { BackToTopButton } from "@/components/layout/back-to-top-button";
 import { getContentPageData } from "@/lib/content/queries";
 
 export const metadata: Metadata = {
@@ -101,6 +102,8 @@ export default async function ContentPage({ params }: ContentPageProps) {
           <DiscussionDigestCard key={discussion.slug} {...discussion} />
         ))}
       </section>
+
+      <BackToTopButton />
     </div>
   );
 }
